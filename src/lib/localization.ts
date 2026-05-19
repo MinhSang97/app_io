@@ -79,6 +79,13 @@ type Dictionary = {
     region: string;
     appVersion: string;
   };
+  settingsPage?: {
+    title: string;
+    themeSection: string;
+    light: string;
+    dark: string;
+    system: string;
+  };
 };
 
 const countryNames: Record<CountryCode, string> = {
@@ -177,6 +184,13 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       region: 'Quốc gia / Vùng',
       appVersion: 'Phiên bản ứng dụng',
     },
+    settingsPage: {
+      title: 'Cài đặt',
+      themeSection: 'Giao diện',
+      light: 'Sáng',
+      dark: 'Tối',
+      system: 'Hệ thống',
+    },
   },
   us: {
     login: {
@@ -257,6 +271,13 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       appleId: 'Apple ID',
       region: 'Country / Region',
       appVersion: 'App Version',
+    },
+    settingsPage: {
+      title: 'Settings',
+      themeSection: 'Theme',
+      light: 'Light',
+      dark: 'Dark',
+      system: 'System',
     },
   },
   gb: {
@@ -798,6 +819,13 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       region: 'ประเทศ / ภูมิภาค',
       appVersion: 'เวอร์ชันแอป',
     },
+    settingsPage: {
+      title: 'การตั้งค่า',
+      themeSection: 'ธีม',
+      light: 'สว่าง',
+      dark: 'มืด',
+      system: 'ระบบ',
+    },
   },
 };
 
@@ -805,6 +833,7 @@ type FullDictionary = Dictionary & {
   scan: NonNullable<Required<Dictionary['scan']>>;
   result: NonNullable<Dictionary['result']>;
   infoPage: NonNullable<Dictionary['infoPage']>;
+  settingsPage: NonNullable<Dictionary['settingsPage']>;
 };
 
 export function getLocale(country: CountryCode): FullDictionary {
@@ -822,5 +851,6 @@ export function getLocale(country: CountryCode): FullDictionary {
     scan: scan as Required<NonNullable<Dictionary['scan']>>,
     result: dict.result ?? dictionaries.us.result!,
     infoPage: dict.infoPage ?? dictionaries.us.infoPage!,
+    settingsPage: dict.settingsPage ?? dictionaries.us.settingsPage!,
   };
 }

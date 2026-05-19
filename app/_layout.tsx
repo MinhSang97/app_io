@@ -7,6 +7,7 @@ import { useAuthStore } from '../src/store/auth';
 import { getPermissionSnapshot } from '../src/hooks/useMealPermissions';
 import { loadPermissionGateCompleted, savePermissionGateCompleted } from '../src/lib/permissionPersistence';
 import { loadSelectedCountry } from '../src/lib/countryPersistence';
+import { useAppTheme } from '../src/hooks/useAppTheme';
 
 export default function RootLayout() {
   const segments = useSegments();
@@ -16,6 +17,7 @@ export default function RootLayout() {
   const permissionGateCompleted = useAuthStore((state) => state.permissionGateCompleted);
   const setSelectedCountry = useAuthStore((state) => state.setSelectedCountry);
   const hasCheckedRef = useRef(false);
+  const { isDark } = useAppTheme();
 
   useEffect(() => {
     (async () => {
@@ -80,7 +82,7 @@ export default function RootLayout() {
 
   return (
     <>
-      <StatusBar style="light" />
+      <StatusBar style={isDark ? "light" : "dark"} />
       <Stack screenOptions={{ headerShown: false, gestureEnabled: false }} />
     </>
   );

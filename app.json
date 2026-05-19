@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "io",
+    "name": "ÍO",
     "slug": "io",
     "scheme": "io",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "plugins": [
       "expo-router",
