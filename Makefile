@@ -1,6 +1,6 @@
 APP_NAME := io
 
-.PHONY: help install start web ios android prebuild build-device build-android clean clean-all
+.PHONY: help install start web ios android prebuild build-device build-android clean clean-all build-local build-local-release
 
 help:
 	@echo "Available commands:"
@@ -16,7 +16,8 @@ help:
 	@echo "    make build-dev     Build dev client for iOS device (EAS)"
 	@echo "    make build-preview Build preview for iOS (EAS)"
 	@echo "    make build-prod    Build production for iOS (EAS)"
-	@echo "    make build-local   Build iOS locally (requires Xcode + iOS SDK)"
+	@echo "    make build-local   Build iOS locally in Debug mode (Metro required)"
+	@echo "    make build-local-release Build iOS locally in Release mode (standalone)"
 	@echo ""
 	@echo "  Cleanup:"
 	@echo "    make clean         Remove node_modules and lockfile"
@@ -52,6 +53,9 @@ build-prod:
 
 build-local:
 	npx expo run:ios --device
+
+build-local-release:
+	npx expo run:ios --device --configuration Release
 
 # ─── Cleanup ─────────────────────────────────────────────────
 
