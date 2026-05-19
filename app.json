@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "io",
+    "slug": "io",
+    "scheme": "io",
+    "userInterfaceStyle": "automatic",
+    "plugins": [
+      "expo-router",
+      "expo-apple-authentication"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true,
+        "NSCameraUsageDescription": "Ứng dụng cần quyền Camera để chụp và quét món ăn.",
+        "NSPhotoLibraryUsageDescription": "Ứng dụng cần quyền Ảnh để chọn ảnh món ăn từ thư viện."
+      },
+      "bundleIdentifier": "com.anonymous.io"
+    },
+    "android": {
+      "package": "com.anonymous.io"
+    }
+  }
+}
