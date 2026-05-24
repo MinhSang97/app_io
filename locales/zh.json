@@ -1,0 +1,5 @@
+{
+  "NSCameraUsageDescription": "应用需要相机访问权限来拍摄和扫描食物。",
+  "NSPhotoLibraryUsageDescription": "应用需要相册访问权限以从相册中选择食物照片。",
+  "NSLocalNetworkUsageDescription": "应用需要本地网络访问权限以连接到开发服务器。"
+}

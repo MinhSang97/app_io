@@ -1,0 +1,5 @@
+{
+  "NSCameraUsageDescription": "L'application a besoin d'accéder à la caméra pour capturer et scanner les repas.",
+  "NSPhotoLibraryUsageDescription": "L'application a besoin d'accéder aux photos pour sélectionner les images des repas dans votre bibliothèque.",
+  "NSLocalNetworkUsageDescription": "L'application a besoin d'accéder au réseau local pour se connecter au serveur de développement."
+}

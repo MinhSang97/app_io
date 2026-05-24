@@ -1,4 +1,5 @@
 import { useColorScheme } from 'react-native';
+import { getAppPalette } from '@/src/ui';
 import { useThemeStore } from '../store/theme';
 
 export function useAppTheme() {
@@ -10,10 +11,12 @@ export function useAppTheme() {
     : selectedTheme;
 
   const isDark = activeScheme === 'dark';
+  const palette = getAppPalette(isDark);
 
   return {
     theme: selectedTheme,
     isDark,
+    palette,
     colors: {
       bg: isDark ? 'bg-zinc-950' : 'bg-zinc-50',
       card: isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10',

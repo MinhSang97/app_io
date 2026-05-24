@@ -1,0 +1,5 @@
+{
+  "NSCameraUsageDescription": "Ứng dụng cần quyền Camera để chụp và quét món ăn.",
+  "NSPhotoLibraryUsageDescription": "Ứng dụng cần quyền Ảnh để chọn ảnh món ăn từ thư viện.",
+  "NSLocalNetworkUsageDescription": "Ứng dụng cần quyền truy cập mạng nội bộ để kết nối với máy chủ phát triển."
+}

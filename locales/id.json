@@ -1,0 +1,5 @@
+{
+  "NSCameraUsageDescription": "Aplikasi memerlukan akses Kamera untuk mengambil dan memindai makanan.",
+  "NSPhotoLibraryUsageDescription": "Aplikasi memerlukan akses Galeri untuk memilih gambar makanan dari pustaka Anda.",
+  "NSLocalNetworkUsageDescription": "Aplikasi memerlukan akses Jaringan Lokal untuk terhubung ke server pengembangan."
+}

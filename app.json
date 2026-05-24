@@ -1,25 +1,56 @@
 {
   "expo": {
-    "name": "ÍO",
+    "name": "IO",
     "slug": "io",
     "scheme": "io",
     "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "locales": {
+      "vi": "./locales/vi.json",
+      "vi-VN": "./locales/vi.json",
+      "en": "./locales/en.json",
+      "en-US": "./locales/en.json",
+      "en-GB": "./locales/en.json",
+      "ja": "./locales/ja.json",
+      "ja-JP": "./locales/ja.json",
+      "ko": "./locales/ko.json",
+      "ko-KR": "./locales/ko.json",
+      "zh": "./locales/zh.json",
+      "zh-Hans": "./locales/zh.json",
+      "zh-Hant": "./locales/zh.json",
+      "zh-CN": "./locales/zh.json",
+      "zh-HK": "./locales/zh.json",
+      "zh-TW": "./locales/zh.json",
+      "th": "./locales/th.json",
+      "th-TH": "./locales/th.json",
+      "fr": "./locales/fr.json",
+      "de": "./locales/de.json",
+      "es": "./locales/es.json",
+      "pt": "./locales/pt.json",
+      "id": "./locales/id.json"
+    },
     "userInterfaceStyle": "automatic",
     "plugins": [
       "expo-router",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      "expo-web-browser"
     ],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true,
         "NSCameraUsageDescription": "Ứng dụng cần quyền Camera để chụp và quét món ăn.",
-        "NSPhotoLibraryUsageDescription": "Ứng dụng cần quyền Ảnh để chọn ảnh món ăn từ thư viện."
+        "NSPhotoLibraryUsageDescription": "Ứng dụng cần quyền Ảnh để chọn ảnh món ăn từ thư viện.",
+        "NSLocalNetworkUsageDescription": "Ứng dụng cần quyền truy cập mạng nội bộ để kết nối với máy chủ phát triển."
       },
-      "bundleIdentifier": "com.anonymous.io"
+      "bundleIdentifier": "io.ai.nutrition"
     },
     "android": {
-      "package": "com.anonymous.io"
+      "package": "io.ai.nutrition"
     }
   }
 }
