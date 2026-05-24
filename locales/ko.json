@@ -1,0 +1,5 @@
+{
+  "NSCameraUsageDescription": "식사를 촬영하고 스캔하려면 카메라 접근 권한이 필요합니다.",
+  "NSPhotoLibraryUsageDescription": "라이브러리에서 식사 이미지를 선택하려면 사진 접근 권한이 필요합니다.",
+  "NSLocalNetworkUsageDescription": "개발 서버에 연결하려면 로컬 네트워크 접근 권한이 필요합니다."
+}

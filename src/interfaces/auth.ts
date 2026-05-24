@@ -1,3 +1,5 @@
+import type { UserInformation } from './user';
+
 export type CountryCode =
   | 'vn'
   | 'us'
@@ -14,13 +16,17 @@ export type CountryCode =
 
 export type AuthState = {
   isSignedIn: boolean;
+  isSessionRestoring: boolean;
   permissionGateCompleted: boolean;
   selectedCountry: CountryCode;
-  appleUserId: string | null;
-  appleFullName: string | null;
-  appleEmail: string | null;
+  user: UserInformation | null;
+  csrfToken: string | null;
   setSelectedCountry: (country: CountryCode) => void;
-  signInWithApple: (payload: { userId: string; fullName: string | null; email: string | null }) => void;
+  setSession: (payload: { user: UserInformation; csrfToken: string }) => void;
+  setUser: (user: UserInformation) => void;
+  setCsrfToken: (csrfToken: string) => void;
+  hydrateFromStorage: (payload: { user: UserInformation; csrfToken: string }) => void;
+  setSessionRestoring: (value: boolean) => void;
   completePermissionGate: () => void;
   signOut: () => void;
 };

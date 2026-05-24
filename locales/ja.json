@@ -1,0 +1,5 @@
+{
+  "NSCameraUsageDescription": "食事を撮影してスキャンするためにカメラへのアクセスが必要です。",
+  "NSPhotoLibraryUsageDescription": "ライブラリから食事の写真を選択するために写真へのアクセスが必要です。",
+  "NSLocalNetworkUsageDescription": "開発サーバーに接続するためにローカルネットワークへのアクセスが必要です。"
+}

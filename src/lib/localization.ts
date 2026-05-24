@@ -10,6 +10,8 @@ type Dictionary = {
     description: string;
     appleUnavailableTitle: string;
     appleUnavailableMessage: string;
+    googleButton: string;
+    or: string;
     loginFailedTitle: string;
     loginFailedMessage: string;
     footer: string;
@@ -75,7 +77,7 @@ type Dictionary = {
     title: string;
     fullName: string;
     email: string;
-    appleId: string;
+    appleID: string;
     region: string;
     appVersion: string;
   };
@@ -85,6 +87,7 @@ type Dictionary = {
     light: string;
     dark: string;
     system: string;
+    languageSection: string;
   };
 };
 
@@ -107,13 +110,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   vn: {
     login: {
       welcome: 'Chào mừng đến với ÍO',
-      title: 'Đăng nhập bằng Apple ID',
-      description: 'Chúng tôi chỉ hỗ trợ Apple Sign In để giữ dữ liệu dinh dưỡng an toàn và onboarding đơn giản.',
+      title: 'Đăng nhập',
+      description: 'Đăng nhập bằng Google hoặc Apple để bảo vệ dữ liệu dinh dưỡng và onboarding nhanh hơn.',
       appleUnavailableTitle: 'Không hỗ trợ Apple Sign In',
       appleUnavailableMessage: 'Thiết bị này không hỗ trợ đăng nhập bằng Apple.',
+      googleButton: 'Đăng nhập bằng Google',
+      or: 'hoặc',
       loginFailedTitle: 'Đăng nhập thất bại',
-      loginFailedMessage: 'Không thể đăng nhập bằng Apple. Vui lòng thử lại.',
-      footer: 'Tiếp tục nghĩa là bạn đồng ý dùng Apple ID làm phương thức đăng nhập duy nhất của ứng dụng.',
+      loginFailedMessage: 'Không thể đăng nhập. Vui lòng thử lại.',
+      footer: 'Tiếp tục nghĩa là bạn đồng ý điều khoản và chính sách bảo mật của ứng dụng.',
       countryLabel: 'Quốc gia',
       countryOptions: countryNames,
       benefits: [
@@ -180,7 +185,7 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       title: 'Thông tin tài khoản',
       fullName: 'Họ và tên',
       email: 'Địa chỉ Email',
-      appleId: 'Apple ID',
+      appleID: 'Apple ID',
       region: 'Quốc gia / Vùng',
       appVersion: 'Phiên bản ứng dụng',
     },
@@ -190,18 +195,21 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       light: 'Sáng',
       dark: 'Tối',
       system: 'Hệ thống',
+      languageSection: 'Ngôn ngữ',
     },
   },
   us: {
     login: {
       welcome: 'Welcome to ÍO',
-      title: 'Sign in with Apple ID',
-      description: 'We only support Apple Sign In to keep your nutrition data secure and onboarding simple.',
+      title: 'Sign in',
+      description: 'Sign in with Google or Apple to keep your nutrition data secure and simplify onboarding.',
       appleUnavailableTitle: 'Apple Sign In unavailable',
       appleUnavailableMessage: 'This device does not support Apple authentication.',
+      googleButton: 'Sign in with Google',
+      or: 'or',
       loginFailedTitle: 'Login failed',
-      loginFailedMessage: 'Could not sign in with Apple. Please try again.',
-      footer: 'By continuing, you agree to use Apple ID as the only sign-in method for this app.',
+      loginFailedMessage: 'Could not sign in. Please try again.',
+      footer: 'By continuing, you agree to the app terms and privacy policy.',
       countryLabel: 'Country',
       countryOptions: countryNames,
       benefits: [
@@ -268,7 +276,7 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       title: 'Account Information',
       fullName: 'Full Name',
       email: 'Email Address',
-      appleId: 'Apple ID',
+      appleID: 'Apple ID',
       region: 'Country / Region',
       appVersion: 'App Version',
     },
@@ -278,18 +286,21 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       light: 'Light',
       dark: 'Dark',
       system: 'System',
+      languageSection: 'Language',
     },
   },
   gb: {
     login: {
       welcome: 'Welcome to ÍO',
-      title: 'Sign in with Apple ID',
-      description: 'We only support Apple Sign In to keep your nutrition data secure and onboarding simple.',
+      title: 'Sign in',
+      description: 'Sign in with Google or Apple to keep your nutrition data secure and simplify onboarding.',
       appleUnavailableTitle: 'Apple Sign In unavailable',
       appleUnavailableMessage: 'This device does not support Apple authentication.',
+      googleButton: 'Sign in with Google',
+      or: 'or',
       loginFailedTitle: 'Login failed',
-      loginFailedMessage: 'Could not sign in with Apple. Please try again.',
-      footer: 'By continuing, you agree to use Apple ID as the only sign-in method for this app.',
+      loginFailedMessage: 'Could not sign in. Please try again.',
+      footer: 'By continuing, you agree to the app terms and privacy policy.',
       countryLabel: 'Country',
       countryOptions: countryNames,
       benefits: [
@@ -354,13 +365,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   jp: {
     login: {
       welcome: 'ÍOへようこそ',
-      title: 'Apple IDでサインイン',
-      description: '栄養データを安全に保つため、Apple Sign In のみをサポートしています。',
+      title: 'サインイン',
+      description: 'Google または Apple でサインインして、栄養データを安全に保ちましょう。',
       appleUnavailableTitle: 'Apple Sign In は利用できません',
       appleUnavailableMessage: 'この端末は Apple 認証をサポートしていません。',
+      googleButton: 'Googleでサインイン',
+      or: 'または',
       loginFailedTitle: 'ログインに失敗しました',
-      loginFailedMessage: 'Appleでサインインできませんでした。もう一度お試しください。',
-      footer: '続行すると、このアプリの唯一のサインイン方法として Apple ID を使用することに同意したものとみなされます。',
+      loginFailedMessage: 'サインインできませんでした。もう一度お試しください。',
+      footer: '続行すると、アプリの利用規約とプライバシーポリシーに同意したものとみなされます。',
       countryLabel: '国',
       countryOptions: countryNames,
       benefits: [
@@ -425,13 +438,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   kr: {
     login: {
       welcome: 'ÍO에 오신 것을 환영합니다',
-      title: 'Apple ID로 로그인',
-      description: '데이터를 안전하게 유지하기 위해 Apple Sign In만 지원합니다.',
+      title: '로그인',
+      description: 'Google 또는 Apple로 로그인하여 영양 데이터를 안전하게 보호하세요.',
       appleUnavailableTitle: 'Apple Sign In을 사용할 수 없습니다',
       appleUnavailableMessage: '이 기기는 Apple 인증을 지원하지 않습니다.',
+      googleButton: 'Google로 로그인',
+      or: '또는',
       loginFailedTitle: '로그인 실패',
-      loginFailedMessage: 'Apple로 로그인할 수 없습니다. 다시 시도해 주세요.',
-      footer: '계속하면 이 앱의 유일한 로그인 방식으로 Apple ID를 사용하는 데 동의하게 됩니다.',
+      loginFailedMessage: '로그인할 수 없습니다. 다시 시도해 주세요.',
+      footer: '계속하면 앱 이용약관 및 개인정보 처리방침에 동의하게 됩니다.',
       countryLabel: '국가',
       countryOptions: countryNames,
       benefits: [
@@ -496,13 +511,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   cn: {
     login: {
       welcome: '欢迎使用 ÍO',
-      title: '使用 Apple ID 登录',
-      description: '为了保证您的营养数据安全，我们仅支持 Apple Sign In。',
+      title: '登录',
+      description: '使用 Google 或 Apple 登录，保护您的营养数据并简化入门流程。',
       appleUnavailableTitle: 'Apple Sign In 不可用',
       appleUnavailableMessage: '此设备不支持 Apple 身份验证。',
+      googleButton: '使用 Google 登录',
+      or: '或',
       loginFailedTitle: '登录失败',
-      loginFailedMessage: '无法使用 Apple 登录，请重试。',
-      footer: '继续即表示您同意将 Apple ID 作为此应用的唯一登录方式。',
+      loginFailedMessage: '无法登录，请重试。',
+      footer: '继续即表示您同意应用条款和隐私政策。',
       countryLabel: '国家',
       countryOptions: countryNames,
       benefits: [
@@ -567,13 +584,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   fr: {
     login: {
       welcome: 'Bienvenue sur ÍO',
-      title: 'Se connecter avec Apple ID',
-      description: 'Nous prenons uniquement en charge Apple Sign In afin de sécuriser vos données nutritionnelles.',
+      title: 'Se connecter',
+      description: 'Connectez-vous avec Google ou Apple pour sécuriser vos données nutritionnelles.',
       appleUnavailableTitle: 'Apple Sign In indisponible',
       appleUnavailableMessage: 'Cet appareil ne prend pas en charge l’authentification Apple.',
+      googleButton: 'Se connecter avec Google',
+      or: 'ou',
       loginFailedTitle: 'Échec de la connexion',
-      loginFailedMessage: 'Impossible de se connecter avec Apple. Veuillez réessayer.',
-      footer: 'En continuant, vous acceptez d’utiliser Apple ID comme unique méthode de connexion de cette application.',
+      loginFailedMessage: 'Impossible de se connecter. Veuillez réessayer.',
+      footer: 'En continuant, vous acceptez les conditions et la politique de confidentialité de l’application.',
       countryLabel: 'Pays',
       countryOptions: countryNames,
       benefits: [
@@ -602,13 +621,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   de: {
     login: {
       welcome: 'Willkommen bei ÍO',
-      title: 'Mit Apple ID anmelden',
-      description: 'Wir unterstützen nur Apple Sign In, um Ihre Ernährungsdaten sicher zu halten.',
+      title: 'Anmelden',
+      description: 'Melden Sie sich mit Google oder Apple an, um Ihre Ernährungsdaten zu schützen.',
       appleUnavailableTitle: 'Apple Sign In nicht verfügbar',
       appleUnavailableMessage: 'Dieses Gerät unterstützt die Apple-Authentifizierung nicht.',
+      googleButton: 'Mit Google anmelden',
+      or: 'oder',
       loginFailedTitle: 'Anmeldung fehlgeschlagen',
-      loginFailedMessage: 'Anmeldung mit Apple nicht möglich. Bitte versuchen Sie es erneut.',
-      footer: 'Mit dem Fortfahren stimmen Sie zu, Apple ID als einzige Anmeldemethode dieser App zu verwenden.',
+      loginFailedMessage: 'Anmeldung nicht möglich. Bitte versuchen Sie es erneut.',
+      footer: 'Mit dem Fortfahren stimmen Sie den Nutzungsbedingungen und der Datenschutzrichtlinie zu.',
       countryLabel: 'Land',
       countryOptions: countryNames,
       benefits: [
@@ -637,13 +658,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   es: {
     login: {
       welcome: 'Bienvenido a ÍO',
-      title: 'Iniciar sesión con Apple ID',
-      description: 'Solo soportamos Apple Sign In para mantener seguros tus datos nutricionales.',
+      title: 'Iniciar sesión',
+      description: 'Inicia sesión con Google o Apple para proteger tus datos nutricionales.',
       appleUnavailableTitle: 'Apple Sign In no disponible',
       appleUnavailableMessage: 'Este dispositivo no admite autenticación de Apple.',
+      googleButton: 'Iniciar sesión con Google',
+      or: 'o',
       loginFailedTitle: 'Error de inicio de sesión',
-      loginFailedMessage: 'No se pudo iniciar sesión con Apple. Inténtalo de nuevo.',
-      footer: 'Al continuar, aceptas usar Apple ID como único método de inicio de sesión de esta app.',
+      loginFailedMessage: 'No se pudo iniciar sesión. Inténtalo de nuevo.',
+      footer: 'Al continuar, aceptas los términos y la política de privacidad de la app.',
       countryLabel: 'País',
       countryOptions: countryNames,
       benefits: [
@@ -672,13 +695,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   pt: {
     login: {
       welcome: 'Bem-vindo ao ÍO',
-      title: 'Entrar com Apple ID',
-      description: 'Apenas suportamos Apple Sign In para manter seus dados nutricionais seguros.',
+      title: 'Entrar',
+      description: 'Entre com Google ou Apple para manter seus dados nutricionais seguros.',
       appleUnavailableTitle: 'Apple Sign In indisponível',
       appleUnavailableMessage: 'Este dispositivo não suporta autenticação da Apple.',
+      googleButton: 'Entrar com Google',
+      or: 'ou',
       loginFailedTitle: 'Falha no login',
-      loginFailedMessage: 'Não foi possível entrar com Apple. Tente novamente.',
-      footer: 'Ao continuar, você concorda em usar o Apple ID como o único método de login deste app.',
+      loginFailedMessage: 'Não foi possível entrar. Tente novamente.',
+      footer: 'Ao continuar, você concorda com os termos e a política de privacidade do app.',
       countryLabel: 'País',
       countryOptions: countryNames,
       benefits: [
@@ -707,13 +732,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   id: {
     login: {
       welcome: 'Selamat datang di ÍO',
-      title: 'Masuk dengan Apple ID',
-      description: 'Kami hanya mendukung Apple Sign In agar data nutrisi Anda tetap aman.',
+      title: 'Masuk',
+      description: 'Masuk dengan Google atau Apple untuk menjaga data nutrisi Anda tetap aman.',
       appleUnavailableTitle: 'Apple Sign In tidak tersedia',
       appleUnavailableMessage: 'Perangkat ini tidak mendukung autentikasi Apple.',
+      googleButton: 'Masuk dengan Google',
+      or: 'atau',
       loginFailedTitle: 'Gagal masuk',
-      loginFailedMessage: 'Tidak dapat masuk dengan Apple. Silakan coba lagi.',
-      footer: 'Dengan melanjutkan, Anda setuju menggunakan Apple ID sebagai satu-satunya metode masuk aplikasi ini.',
+      loginFailedMessage: 'Tidak dapat masuk. Silakan coba lagi.',
+      footer: 'Dengan melanjutkan, Anda setuju dengan ketentuan dan kebijakan privasi aplikasi.',
       countryLabel: 'Negara',
       countryOptions: countryNames,
       benefits: [
@@ -742,13 +769,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   th: {
     login: {
       welcome: 'ยินดีต้อนรับสู่ ÍO',
-      title: 'เข้าสู่ระบบด้วย Apple ID',
-      description: 'เรารองรับเฉพาะ Apple Sign In เพื่อรักษาความปลอดภัยข้อมูลโภชนาการของคุณ',
+      title: 'เข้าสู่ระบบ',
+      description: 'เข้าสู่ระบบด้วย Google หรือ Apple เพื่อรักษาความปลอดภัยข้อมูลโภชนาการของคุณ',
       appleUnavailableTitle: 'ไม่สามารถใช้งาน Apple Sign In ได้',
       appleUnavailableMessage: 'อุปกรณ์นี้ไม่รองรับการยืนยันตัวตนของ Apple',
+      googleButton: 'เข้าสู่ระบบด้วย Google',
+      or: 'หรือ',
       loginFailedTitle: 'เข้าสู่ระบบไม่สำเร็จ',
-      loginFailedMessage: 'ไม่สามารถเข้าสู่ระบบด้วย Apple ได้ โปรดลองอีกครั้ง',
-      footer: 'การดำเนินการต่อหมายความว่าคุณยอมรับให้ใช้ Apple ID เป็นวิธีเข้าสู่ระบบเพียงวิธีเดียวของแอปนี้',
+      loginFailedMessage: 'ไม่สามารถเข้าสู่ระบบได้ โปรดลองอีกครั้ง',
+      footer: 'การดำเนินการต่อหมายความว่าคุณยอมรับข้อกำหนดและนโยบายความเป็นส่วนตัวของแอป',
       countryLabel: 'ประเทศ',
       countryOptions: countryNames,
       benefits: [
@@ -815,7 +844,7 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       title: 'ข้อมูลบัญชี',
       fullName: 'ชื่อ-นามสกุล',
       email: 'ที่อยู่อีเมล',
-      appleId: 'Apple ID',
+      appleID: 'Apple ID',
       region: 'ประเทศ / ภูมิภาค',
       appVersion: 'เวอร์ชันแอป',
     },
@@ -825,6 +854,7 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       light: 'สว่าง',
       dark: 'มืด',
       system: 'ระบบ',
+      languageSection: 'ภาษา',
     },
   },
 };

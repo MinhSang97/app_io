@@ -1,107 +1,74 @@
 import { router } from 'expo-router';
-import { ArrowLeft, User, Mail, Shield, Globe, Info } from 'lucide-react-native';
-import { Pressable, Text, View, ScrollView } from 'react-native';
+import { Globe, Info, Mail, Shield, User } from 'lucide-react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { getLocale } from '../src/lib/localization';
 import { useAuthStore } from '../src/store/auth';
-import { useAppTheme } from '../src/hooks/useAppTheme';
+import { useAppTheme } from '../src/hooks/use_app_theme';
+import { AppCard, BackHeader, InfoRow, Screen, spacing } from '@/src/ui';
 
 export default function InfoScreen() {
   const selectedCountry = useAuthStore((state) => state.selectedCountry);
-  const appleFullName = useAuthStore((state) => state.appleFullName);
-  const appleEmail = useAuthStore((state) => state.appleEmail);
-  const appleUserId = useAuthStore((state) => state.appleUserId);
-  const { colors, isDark } = useAppTheme();
+  const user = useAuthStore((state) => state.user);
+  const { palette } = useAppTheme();
   const locale = getLocale(selectedCountry);
 
-  const userDisplayName = appleFullName || 'ÍO User';
-  const userEmailAddress = appleEmail || 'No email shared';
-  const userAppleIdFormatted = appleUserId 
-    ? `${appleUserId.substring(0, 16)}...` 
-    : 'N/A';
+  const userDisplayName = user?.username?.trim() || 'ÍO User';
+  const userEmailAddress = user?.email?.trim() || 'No email shared';
+  const userIdFormatted = user?.user_id ? `${user.user_id.substring(0, 16)}...` : 'N/A';
 
   return (
-    <View className={`flex-1 px-6 pt-16 ${colors.bg}`}>
-      {/* Header row with back button */}
-      <View className="flex-row items-center gap-4 mb-8">
-        <Pressable 
-          onPress={() => router.back()} 
-          className={`rounded-full p-3 border active:opacity-75 ${colors.closeButtonBg} ${colors.border}`}
-        >
-          <ArrowLeft size={20} color={isDark ? '#fff' : '#000'} />
-        </Pressable>
-        <Text className={`text-2xl font-bold ${colors.text}`}>{locale.infoPage.title}</Text>
+    <Screen palette={palette}>
+      <BackHeader palette={palette} title={locale.infoPage.title} onBack={() => router.back()} />
+
+      <AppCard palette={palette} style={styles.profileCard}>
+        <View style={[styles.avatar, { backgroundColor: palette.accentSoft, borderColor: palette.border }]}>
+          <User size={36} color={palette.accent} />
+        </View>
+        <View style={styles.profileText}>
+          <Text style={[styles.profileName, { color: palette.text }]}>{userDisplayName}</Text>
+          <Text style={[styles.profileEmail, { color: palette.subText }]}>{userEmailAddress}</Text>
+        </View>
+      </AppCard>
+
+      <View style={styles.rows}>
+        <InfoRow palette={palette} icon={User} label={locale.infoPage.fullName} value={userDisplayName} />
+        <InfoRow palette={palette} icon={Mail} label={locale.infoPage.email} value={userEmailAddress} />
+        <InfoRow palette={palette} icon={Shield} label={locale.infoPage.appleID} value={userIdFormatted} />
+        <InfoRow palette={palette} icon={Globe} label={locale.infoPage.region} value={selectedCountry.toUpperCase()} />
+        <InfoRow palette={palette} icon={Info} label={locale.infoPage.appVersion} value="1.0.0 (Build 1)" />
       </View>
-
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-        {/* User Card Header */}
-        <View className={`items-center mb-8 rounded-[28px] p-6 border ${colors.card}`}>
-          <View className={`w-20 h-20 rounded-full items-center justify-center mb-4 border ${colors.emeraldBg}`}>
-            <User size={40} color={isDark ? '#34d399' : '#059669'} />
-          </View>
-          <Text className={`text-xl font-bold ${colors.text}`}>{userDisplayName}</Text>
-          <Text className={`text-sm mt-1 ${colors.subText}`}>{userEmailAddress}</Text>
-        </View>
-
-        {/* Info Rows */}
-        <View className="gap-4 mb-10">
-          {/* Full Name Row */}
-          <View className={`flex-row items-center gap-4 px-5 py-4 rounded-2xl border ${colors.rowBg} ${colors.borderOnly}`}>
-            <View className={`rounded-xl p-2.5 ${colors.iconContainer}`}>
-              <User size={18} color={colors.iconColor} />
-            </View>
-            <View className="flex-1">
-              <Text className={`text-xs ${colors.subText}`}>{locale.infoPage.fullName}</Text>
-              <Text className={`text-base font-semibold mt-0.5 ${colors.text}`}>{userDisplayName}</Text>
-            </View>
-          </View>
-
-          {/* Email Row */}
-          <View className={`flex-row items-center gap-4 px-5 py-4 rounded-2xl border ${colors.rowBg} ${colors.borderOnly}`}>
-            <View className={`rounded-xl p-2.5 ${colors.iconContainer}`}>
-              <Mail size={18} color={colors.iconColor} />
-            </View>
-            <View className="flex-1">
-              <Text className={`text-xs ${colors.subText}`}>{locale.infoPage.email}</Text>
-              <Text className={`text-base font-semibold mt-0.5 ${colors.text}`} numberOfLines={1}>{userEmailAddress}</Text>
-            </View>
-          </View>
-
-          {/* Apple ID Row */}
-          <View className={`flex-row items-center gap-4 px-5 py-4 rounded-2xl border ${colors.rowBg} ${colors.borderOnly}`}>
-            <View className={`rounded-xl p-2.5 ${colors.iconContainer}`}>
-              <Shield size={18} color={colors.iconColor} />
-            </View>
-            <View className="flex-1">
-              <Text className={`text-xs ${colors.subText}`}>{locale.infoPage.appleId}</Text>
-              <Text className={`text-base font-semibold mt-0.5 ${colors.text}`}>{userAppleIdFormatted}</Text>
-            </View>
-          </View>
-
-          {/* Country / Region Row */}
-          <View className={`flex-row items-center gap-4 px-5 py-4 rounded-2xl border ${colors.rowBg} ${colors.borderOnly}`}>
-            <View className={`rounded-xl p-2.5 ${colors.iconContainer}`}>
-              <Globe size={18} color={colors.iconColor} />
-            </View>
-            <View className="flex-1">
-              <Text className={`text-xs ${colors.subText}`}>{locale.infoPage.region}</Text>
-              <Text className={`text-base font-semibold mt-0.5 ${colors.text}`}>
-                {selectedCountry.toUpperCase()}
-              </Text>
-            </View>
-          </View>
-
-          {/* App Version Row */}
-          <View className={`flex-row items-center gap-4 px-5 py-4 rounded-2xl border ${colors.rowBg} ${colors.borderOnly}`}>
-            <View className={`rounded-xl p-2.5 ${colors.iconContainer}`}>
-              <Info size={18} color={colors.iconColor} />
-            </View>
-            <View className="flex-1">
-              <Text className={`text-xs ${colors.subText}`}>{locale.infoPage.appVersion}</Text>
-              <Text className={`text-base font-semibold mt-0.5 ${colors.text}`}>1.0.0 (Build 1)</Text>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-    </View>
+    </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  profileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+    marginBottom: spacing.lg,
+  },
+  avatar: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileText: {
+    flex: 1,
+  },
+  profileName: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  profileEmail: {
+    marginTop: 4,
+    fontSize: 14,
+  },
+  rows: {
+    gap: spacing.sm,
+    paddingBottom: spacing.xxl,
+  },
+});

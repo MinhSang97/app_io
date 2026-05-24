@@ -1,0 +1,5 @@
+{
+  "NSCameraUsageDescription": "Die App benötigt Kamerazugriff, um Mahlzeiten aufzunehmen und zu scannen.",
+  "NSPhotoLibraryUsageDescription": "Die App benötigt Fotozugriff, um Mahlzeitenbilder aus Ihrer Mediathek auszuwählen.",
+  "NSLocalNetworkUsageDescription": "Die App benötigt Zugriff auf das lokale Netzwerk, um eine Verbindung zum Entwicklungsserver herzustellen."
+}

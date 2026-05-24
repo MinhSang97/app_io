@@ -1,25 +1,23 @@
 import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { Alert, Animated, Dimensions, Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Animated, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Camera as CameraIcon, ArrowLeftRight, CameraOff, Sparkles, Upload, UtensilsCrossed, X, User, Info, LogOut, Settings } from 'lucide-react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImagePicker from 'expo-image-picker';
-import { useMealPermissions } from '../src/hooks/useMealPermissions';
+import { useMealPermissions } from '../src/hooks/use_meal_permissions';
 import { getLocale } from '../src/lib/localization';
 import { useAuthStore } from '../src/store/auth';
-import { useAppTheme } from '../src/hooks/useAppTheme';
-import { useMemo } from 'react';
+import { useAppTheme } from '../src/hooks/use_app_theme';
+import { PrimaryButton, Screen, spacing } from '@/src/ui';
+import { performSignOut } from '../src/lib/auth_session';
 
 export default function ScanScreen() {
   const { syncPermissions } = useMealPermissions();
   const selectedCountry = useAuthStore((state) => state.selectedCountry);
   const locale = getLocale(selectedCountry);
-  const { colors, isDark } = useAppTheme();
-  const signOut = useAuthStore((state) => state.signOut);
-  const appleFullName = useAuthStore((state) => state.appleFullName);
-  const appleEmail = useAuthStore((state) => state.appleEmail);
-  const appleUserId = useAuthStore((state) => state.appleUserId);
+  const { colors, isDark, palette } = useAppTheme();
+  const user = useAuthStore((state) => state.user);
 
   const steps = useMemo(() => [
     {
@@ -90,8 +88,7 @@ export default function ScanScreen() {
           style: 'destructive',
           onPress: () => {
             closeSidebar(() => {
-              signOut();
-              router.replace('/login');
+              void performSignOut().then(() => router.replace('/'));
             });
           }
         }
@@ -248,23 +245,29 @@ export default function ScanScreen() {
     );
   }
 
+  const scanFooter = (
+    <PrimaryButton
+      palette={palette}
+      label={pickedImageUris.length > 0 ? locale.scan.process : locale.scan.scan}
+      onPress={pickedImageUris.length > 0 ? () => router.push('/result') : handleOpenCamera}
+    />
+  );
+
   return (
-    <View className={`flex-1 px-6 pt-16 ${colors.bg}`}>
-      <View className="flex-row justify-between items-start">
-        <View className="flex-1">
-          <Text className={`text-sm uppercase tracking-[0.3em] ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>{locale.scan.appSubtitle}</Text>
-          <Text className={`mt-3 text-4xl font-bold ${colors.text}`}>{locale.scan.title}</Text>
+    <Screen palette={palette} footer={scanFooter}>
+      <View style={scanStyles.topRow}>
+        <View style={scanStyles.topText}>
+          <Text style={[scanStyles.eyebrow, { color: palette.accent }]}>{locale.scan.appSubtitle}</Text>
+          <Text style={[scanStyles.title, { color: palette.text }]}>{locale.scan.title}</Text>
         </View>
-        <Pressable 
+        <Pressable
           onPress={openSidebar}
-          className={`rounded-full border p-3.5 mt-1 active:opacity-75 ${colors.closeButtonBg} ${colors.border}`}
+          style={[scanStyles.menuButton, { backgroundColor: palette.cardBg, borderColor: palette.border }]}
         >
-          <User size={22} color={isDark ? '#fff' : '#000'} />
+          <User size={22} color={palette.text} />
         </Pressable>
       </View>
-      <Text className={`mt-3 text-base leading-6 ${colors.subText}`}>
-        {locale.scan.description}
-      </Text>
+      <Text style={[scanStyles.description, { color: palette.subText }]}>{locale.scan.description}</Text>
  
       <Modal visible={userMenuOpen} transparent animationType="fade" onRequestClose={() => closeSidebar()}>
         <View className="flex-1 flex-row">
@@ -294,10 +297,10 @@ export default function ScanScreen() {
                   <User size={38} color={isDark ? '#34d399' : '#059669'} />
                 </View>
                 <Text className={`text-lg font-bold text-center ${colors.text}`} numberOfLines={1}>
-                  {appleFullName || 'ÍO User'}
+                  {user?.username?.trim() || 'ÍO User'}
                 </Text>
                 <Text className={`text-xs mt-1 text-center ${colors.subText}`} numberOfLines={1}>
-                  {appleEmail || 'No email shared'}
+                  {user?.email?.trim() || 'No email shared'}
                 </Text>
               </View>
  
@@ -414,17 +417,6 @@ export default function ScanScreen() {
         })}
       </View>
  
-      <View className="mt-auto pb-10">
-        <Pressable 
-          onPress={pickedImageUris.length > 0 ? () => router.push('/result') : handleOpenCamera} 
-          className={`rounded-3xl py-4 shadow-lg ${colors.buttonBg} ${isDark ? 'shadow-emerald-500/30' : 'shadow-emerald-500/20'}`}
-        >
-          <Text className={`text-center text-base font-bold ${colors.buttonText}`}>
-            {pickedImageUris.length > 0 ? locale.scan.process : locale.scan.scan}
-          </Text>
-        </Pressable>
-      </View>
-
       <Modal visible={!!fullscreenImageUri} transparent animationType="fade" onRequestClose={() => setFullscreenImageUri(null)}>
         <View className="flex-1 bg-black justify-center items-center">
           <Pressable onPress={() => setFullscreenImageUri(null)} className="absolute right-6 top-16 z-10 rounded-full bg-white/20 p-3">
@@ -435,6 +427,44 @@ export default function ScanScreen() {
           )}
         </View>
       </Modal>
-    </View>
+    </Screen>
   );
 }
+
+const scanStyles = StyleSheet.create({
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  topText: {
+    flex: 1,
+  },
+  eyebrow: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+  },
+  title: {
+    marginTop: spacing.sm,
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '800',
+  },
+  description: {
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: spacing.lg,
+  },
+  menuButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
