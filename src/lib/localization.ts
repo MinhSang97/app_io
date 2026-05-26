@@ -72,6 +72,9 @@ type Dictionary = {
     calories: string;
     protein: string;
     carbs: string;
+    fat: string;
+    fiber: string;
+    backToHistory: string;
   };
   infoPage?: {
     title: string;
@@ -88,6 +91,12 @@ type Dictionary = {
     dark: string;
     system: string;
     languageSection: string;
+  };
+  historyPage?: {
+    title: string;
+    noHistory: string;
+    scanNew: string;
+    searchPlaceholder: string;
   };
 };
 
@@ -109,7 +118,7 @@ const countryNames: Record<CountryCode, string> = {
 const dictionaries: Record<CountryCode, Dictionary> = {
   vn: {
     login: {
-      welcome: 'Chào mừng đến với ÍO',
+      welcome: 'Chào mừng đến với F Calories',
       title: 'Đăng nhập',
       description: 'Đăng nhập bằng Google hoặc Apple để bảo vệ dữ liệu dinh dưỡng và onboarding nhanh hơn.',
       appleUnavailableTitle: 'Không hỗ trợ Apple Sign In',
@@ -180,6 +189,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       calories: 'Calories',
       protein: 'Protein',
       carbs: 'Carbs',
+      fat: 'Chất béo',
+      fiber: 'Chất xơ',
+      backToHistory: 'Quay lại lịch sử',
+    },
+    historyPage: {
+      title: 'Lịch sử quét',
+      noHistory: 'Chưa có lịch sử quét món ăn.',
+      scanNew: 'Quét món ăn đầu tiên của bạn',
+      searchPlaceholder: 'Tìm kiếm tên món ăn...',
     },
     infoPage: {
       title: 'Thông tin tài khoản',
@@ -200,7 +218,7 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   },
   us: {
     login: {
-      welcome: 'Welcome to ÍO',
+      welcome: 'Welcome to F Calories',
       title: 'Sign in',
       description: 'Sign in with Google or Apple to keep your nutrition data secure and simplify onboarding.',
       appleUnavailableTitle: 'Apple Sign In unavailable',
@@ -271,6 +289,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       calories: 'Calories',
       protein: 'Protein',
       carbs: 'Carbs',
+      fat: 'Fat',
+      fiber: 'Fiber',
+      backToHistory: 'Back to History',
+    },
+    historyPage: {
+      title: 'Scan History',
+      noHistory: 'No scans recorded yet.',
+      scanNew: 'Scan your first meal',
+      searchPlaceholder: 'Search by meal name...',
     },
     infoPage: {
       title: 'Account Information',
@@ -291,7 +318,7 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   },
   gb: {
     login: {
-      welcome: 'Welcome to ÍO',
+      welcome: 'Welcome to F Calories',
       title: 'Sign in',
       description: 'Sign in with Google or Apple to keep your nutrition data secure and simplify onboarding.',
       appleUnavailableTitle: 'Apple Sign In unavailable',
@@ -360,11 +387,14 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       calories: 'Calories',
       protein: 'Protein',
       carbs: 'Carbs',
+      fat: 'Fat',
+      fiber: 'Fiber',
+      backToHistory: 'Back to History',
     },
   },
   jp: {
     login: {
-      welcome: 'ÍOへようこそ',
+      welcome: 'F Caloriesへようこそ',
       title: 'サインイン',
       description: 'Google または Apple でサインインして、栄養データを安全に保ちましょう。',
       appleUnavailableTitle: 'Apple Sign In は利用できません',
@@ -433,11 +463,14 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       calories: 'カロリー',
       protein: 'タンパク質',
       carbs: '炭水化物',
+      fat: '脂質',
+      fiber: '食物繊維',
+      backToHistory: '履歴に戻る',
     },
   },
   kr: {
     login: {
-      welcome: 'ÍO에 오신 것을 환영합니다',
+      welcome: 'F Calories에 오신 것을 환영합니다',
       title: '로그인',
       description: 'Google 또는 Apple로 로그인하여 영양 데이터를 안전하게 보호하세요.',
       appleUnavailableTitle: 'Apple Sign In을 사용할 수 없습니다',
@@ -506,11 +539,14 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       calories: '칼로리',
       protein: '단백질',
       carbs: '탄수화물',
+      fat: '지방',
+      fiber: '식이섬유',
+      backToHistory: '기록으로 돌아가기',
     },
   },
   cn: {
     login: {
-      welcome: '欢迎使用 ÍO',
+      welcome: '欢迎使用 F Calories',
       title: '登录',
       description: '使用 Google 或 Apple 登录，保护您的营养数据并简化入门流程。',
       appleUnavailableTitle: 'Apple Sign In 不可用',
@@ -579,11 +615,14 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       calories: '热量',
       protein: '蛋白质',
       carbs: '碳水化合物',
+      fat: '脂肪',
+      fiber: '膳食纤维',
+      backToHistory: '返回历史记录',
     },
   },
   fr: {
     login: {
-      welcome: 'Bienvenue sur ÍO',
+      welcome: 'Bienvenue sur F Calories',
       title: 'Se connecter',
       description: 'Connectez-vous avec Google ou Apple pour sécuriser vos données nutritionnelles.',
       appleUnavailableTitle: 'Apple Sign In indisponible',
@@ -620,7 +659,7 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   },
   de: {
     login: {
-      welcome: 'Willkommen bei ÍO',
+      welcome: 'Willkommen bei F Calories',
       title: 'Anmelden',
       description: 'Melden Sie sich mit Google oder Apple an, um Ihre Ernährungsdaten zu schützen.',
       appleUnavailableTitle: 'Apple Sign In nicht verfügbar',
@@ -657,7 +696,7 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   },
   es: {
     login: {
-      welcome: 'Bienvenido a ÍO',
+      welcome: 'Bienvenido a F Calories',
       title: 'Iniciar sesión',
       description: 'Inicia sesión con Google o Apple para proteger tus datos nutricionales.',
       appleUnavailableTitle: 'Apple Sign In no disponible',
@@ -694,7 +733,7 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   },
   pt: {
     login: {
-      welcome: 'Bem-vindo ao ÍO',
+      welcome: 'Bem-vindo ao F Calories',
       title: 'Entrar',
       description: 'Entre com Google ou Apple para manter seus dados nutricionais seguros.',
       appleUnavailableTitle: 'Apple Sign In indisponível',
@@ -731,7 +770,7 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   },
   id: {
     login: {
-      welcome: 'Selamat datang di ÍO',
+      welcome: 'Selamat datang di F Calories',
       title: 'Masuk',
       description: 'Masuk dengan Google atau Apple untuk menjaga data nutrisi Anda tetap aman.',
       appleUnavailableTitle: 'Apple Sign In tidak tersedia',
@@ -768,7 +807,7 @@ const dictionaries: Record<CountryCode, Dictionary> = {
   },
   th: {
     login: {
-      welcome: 'ยินดีต้อนรับสู่ ÍO',
+      welcome: 'ยินดีต้อนรับสู่ F Calories',
       title: 'เข้าสู่ระบบ',
       description: 'เข้าสู่ระบบด้วย Google หรือ Apple เพื่อรักษาความปลอดภัยข้อมูลโภชนาการของคุณ',
       appleUnavailableTitle: 'ไม่สามารถใช้งาน Apple Sign In ได้',
@@ -839,6 +878,9 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       calories: 'แคลอรี',
       protein: 'โปรตีน',
       carbs: 'คาร์โบไฮเดรต',
+      fat: 'ไขมัน',
+      fiber: 'ใยอาหาร',
+      backToHistory: 'กลับไปที่ประวัติ',
     },
     infoPage: {
       title: 'ข้อมูลบัญชี',
@@ -864,6 +906,7 @@ type FullDictionary = Dictionary & {
   result: NonNullable<Dictionary['result']>;
   infoPage: NonNullable<Dictionary['infoPage']>;
   settingsPage: NonNullable<Dictionary['settingsPage']>;
+  historyPage: NonNullable<Dictionary['historyPage']>;
 };
 
 export function getLocale(country: CountryCode): FullDictionary {
@@ -882,5 +925,6 @@ export function getLocale(country: CountryCode): FullDictionary {
     result: dict.result ?? dictionaries.us.result!,
     infoPage: dict.infoPage ?? dictionaries.us.infoPage!,
     settingsPage: dict.settingsPage ?? dictionaries.us.settingsPage!,
+    historyPage: dict.historyPage ?? dictionaries.us.historyPage!,
   };
 }

@@ -12,7 +12,7 @@ export default function InfoScreen() {
   const { palette } = useAppTheme();
   const locale = getLocale(selectedCountry);
 
-  const userDisplayName = user?.username?.trim() || 'ÍO User';
+  const userDisplayName = user?.username?.trim() || 'F Calories User';
   const userEmailAddress = user?.email?.trim() || 'No email shared';
   const userIdFormatted = user?.user_id ? `${user.user_id.substring(0, 16)}...` : 'N/A';
 

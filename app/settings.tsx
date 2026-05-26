@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { Laptop, Moon, Sun, Check, type LucideIcon } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View, InteractionManager } from 'react-native';
+import { Laptop, Moon, Sun, Check, Heart, type LucideIcon } from 'lucide-react-native';
+import { Pressable, StyleSheet, Text, View, InteractionManager, Alert, Platform } from 'react-native';
 import { getLocale, COUNTRY_OPTIONS } from '../src/lib/localization';
 import { useAuthStore } from '../src/store/auth';
 import { useThemeStore, ThemeType } from '../src/store/theme';
 import { useAppTheme } from '../src/hooks/use_app_theme';
 import { update_user_theme, update_user_locale } from '../src/apis/user';
 import { THEME_BY_TYPE, LOCALE_BY_COUNTRY } from '../src/constants/user_preferences';
-import { BackHeader, radius, Screen, SectionLabel, spacing, SelectField, BottomSheet } from '@/src/ui';
-
+import { BackHeader, radius, Screen, SectionLabel, spacing, SelectField, BottomSheet, PrimaryButton } from '@/src/ui';
+import { syncAppleHealth } from '../src/lib/health_sync';
 
 export default function SettingsScreen() {
   const selectedCountry = useAuthStore((state) => state.selectedCountry);
@@ -23,6 +23,18 @@ export default function SettingsScreen() {
   const locale = getLocale(selectedCountry);
 
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleHealthSync = async () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+
+    try {
+      await syncAppleHealth(true, locale.settingsPage.title || "Health Sync");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const themeOptions: { key: ThemeType; label: string; icon: LucideIcon }[] = [
     { key: 'light', label: locale.settingsPage.light, icon: Sun },
@@ -123,6 +135,16 @@ export default function SettingsScreen() {
             label={locale.settingsPage.languageSection}
             value={locale.login.countryOptions[selectedCountry]}
             onPress={() => setCountryPickerOpen(true)}
+          />
+        </View>
+
+        <SectionLabel palette={palette} label="Đồng bộ sức khỏe" />
+        <View style={styles.options}>
+          <PrimaryButton
+            palette={palette}
+            label={isSyncing ? "Đang đồng bộ..." : "Đồng bộ Apple Health"}
+            onPress={handleHealthSync}
+            icon={Heart}
           />
         </View>
       </Screen>
