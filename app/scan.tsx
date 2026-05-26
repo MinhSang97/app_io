@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Animated, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Camera as CameraIcon, ArrowLeftRight, CameraOff, Sparkles, Upload, UtensilsCrossed, X, User, Info, LogOut, Settings } from 'lucide-react-native';
+import { ActivityIndicator, Alert, Animated, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Camera as CameraIcon, ArrowLeftRight, CameraOff, Sparkles, Upload, UtensilsCrossed, X, User, Info, LogOut, Settings, History } from 'lucide-react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import * as ImagePicker from 'expo-image-picker';
@@ -11,6 +11,8 @@ import { useAuthStore } from '../src/store/auth';
 import { useAppTheme } from '../src/hooks/use_app_theme';
 import { PrimaryButton, Screen, spacing } from '@/src/ui';
 import { performSignOut } from '../src/lib/auth_session';
+import { createScan } from '../src/apis/scan';
+
 
 export default function ScanScreen() {
   const { syncPermissions } = useMealPermissions();
@@ -77,6 +79,13 @@ export default function ScanScreen() {
     });
   };
 
+  const handleShowHistory = () => {
+    closeSidebar(() => {
+      router.push('/history');
+    });
+  };
+
+
   const handleLogout = () => {
     Alert.alert(
       locale.scan.logout,
@@ -102,6 +111,54 @@ export default function ScanScreen() {
   const [savePromptVisible, setSavePromptVisible] = useState(false);
   const [capturedImageUri, setCapturedImageUri] = useState<string | null>(null);
   const cameraRef = useRef<CameraView>(null);
+  const [isScanning, setIsScanning] = useState(false);
+
+  const handleProcessScan = async () => {
+    if (pickedImageUris.length === 0) return;
+    setIsScanning(true);
+    try {
+      const params = {
+        images: pickedImageUris.map((uri) => {
+          const filename = uri.split('/').pop() || 'image.jpg';
+          const ext = filename.split('.').pop()?.toLowerCase();
+          let type = 'image/jpeg';
+          if (ext === 'png') type = 'image/png';
+          else if (ext === 'gif') type = 'image/gif';
+          else if (ext === 'webp') type = 'image/webp';
+          else if (ext === 'heic') type = 'image/heic';
+          else if (ext === 'heif') type = 'image/heif';
+
+          return {
+            uri,
+            name: filename,
+            type,
+          };
+        }),
+      };
+
+      const res = await createScan(params);
+      if (res.success && res.data?.data?.id) {
+        setPickedImageUris([]);
+        router.push({
+          pathname: '/result',
+          params: { id: res.data.data.id },
+        });
+      } else {
+        Alert.alert(
+          selectedCountry === 'vn' ? 'Lỗi phân tích' : 'Analysis Failed',
+          res.error || (selectedCountry === 'vn' ? 'Đã xảy ra lỗi khi phân tích món ăn.' : 'Failed to analyze the meal. Please try again.')
+        );
+      }
+    } catch (err: any) {
+      Alert.alert(
+        selectedCountry === 'vn' ? 'Lỗi kết nối' : 'Connection Error',
+        err.message || (selectedCountry === 'vn' ? 'Đã xảy ra lỗi khi kết nối với máy chủ.' : 'Connection error. Please try again.')
+      );
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
 
   useEffect(() => {
     if (didInitialCheckRef.current) return;
@@ -249,7 +306,7 @@ export default function ScanScreen() {
     <PrimaryButton
       palette={palette}
       label={pickedImageUris.length > 0 ? locale.scan.process : locale.scan.scan}
-      onPress={pickedImageUris.length > 0 ? () => router.push('/result') : handleOpenCamera}
+      onPress={pickedImageUris.length > 0 ? handleProcessScan : handleOpenCamera}
     />
   );
 
@@ -297,7 +354,7 @@ export default function ScanScreen() {
                   <User size={38} color={isDark ? '#34d399' : '#059669'} />
                 </View>
                 <Text className={`text-lg font-bold text-center ${colors.text}`} numberOfLines={1}>
-                  {user?.username?.trim() || 'ÍO User'}
+                  {user?.username?.trim() || 'F Calories User'}
                 </Text>
                 <Text className={`text-xs mt-1 text-center ${colors.subText}`} numberOfLines={1}>
                   {user?.email?.trim() || 'No email shared'}
@@ -312,6 +369,14 @@ export default function ScanScreen() {
                 >
                   <Info size={20} color={isDark ? '#a1a1aa' : '#71717a'} />
                   <Text className={`text-base font-semibold ${colors.text}`}>{locale.scan.info}</Text>
+                </Pressable>
+
+                <Pressable 
+                  onPress={handleShowHistory} 
+                  className={`flex-row items-center gap-3.5 px-4 py-3.5 rounded-2xl border ${colors.rowBg} ${colors.borderOnly}`}
+                >
+                  <History size={20} color={isDark ? '#a1a1aa' : '#71717a'} />
+                  <Text className={`text-base font-semibold ${colors.text}`}>{locale.historyPage.title}</Text>
                 </Pressable>
  
                 <Pressable 
@@ -425,6 +490,20 @@ export default function ScanScreen() {
           {fullscreenImageUri && (
             <Image source={{ uri: fullscreenImageUri }} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
           )}
+        </View>
+      </Modal>
+
+      <Modal visible={isScanning} transparent animationType="fade">
+        <View className="flex-1 items-center justify-center bg-black/60 px-6">
+          <View className="w-full max-w-[280px] rounded-[28px] border border-white/10 bg-zinc-950 p-6 items-center">
+            <ActivityIndicator size="large" color="#34d399" />
+            <Text className="mt-4 text-center text-base font-bold text-white">
+              {selectedCountry === 'vn' ? 'AI đang phân tích món ăn...' : 'AI is analyzing your meal...'}
+            </Text>
+            <Text className="mt-2 text-center text-xs text-zinc-400">
+              {selectedCountry === 'vn' ? 'Vui lòng chờ trong giây lát' : 'Please wait a moment'}
+            </Text>
+          </View>
         </View>
       </Modal>
     </Screen>

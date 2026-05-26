@@ -80,3 +80,15 @@ export function getUserRolePriority(role: UserRole): number {
       return 5;
   }
 }
+
+export const SCAN_PATHS = {
+  CREATE: '/scans',
+  LIST: '/scans/list',
+  GET: '/scans',
+} as const;
+
+export const SCAN = combinePath<typeof SCAN_PATHS, keyof typeof SCAN_PATHS>(
+  API_BASE_URL,
+  SCAN_PATHS,
+);
+

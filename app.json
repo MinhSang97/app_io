@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "IO",
+    "name": "F Calories",
     "slug": "io",
     "scheme": "io",
     "icon": "./assets/icon.png",
@@ -37,15 +37,28 @@
     "plugins": [
       "expo-router",
       "expo-apple-authentication",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "react-native-health",
+        {
+          "healthSharePermission": "Ứng dụng cần quyền đọc thông tin sức khỏe (số bước, năng lượng hoạt động) để đồng bộ.",
+          "healthUpdatePermission": "Ứng dụng cần quyền ghi dữ liệu dinh dưỡng (calories, carbs, protein, fat, fiber) để lưu thông tin bữa ăn."
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": true,
+      "entitlements": {
+        "com.apple.developer.healthkit": true,
+        "com.apple.developer.healthkit.background-delivery": true
+      },
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true,
         "NSCameraUsageDescription": "Ứng dụng cần quyền Camera để chụp và quét món ăn.",
         "NSPhotoLibraryUsageDescription": "Ứng dụng cần quyền Ảnh để chọn ảnh món ăn từ thư viện.",
-        "NSLocalNetworkUsageDescription": "Ứng dụng cần quyền truy cập mạng nội bộ để kết nối với máy chủ phát triển."
+        "NSLocalNetworkUsageDescription": "Ứng dụng cần quyền truy cập mạng nội bộ để kết nối với máy chủ phát triển.",
+        "NSHealthShareUsageDescription": "Ứng dụng cần quyền đọc thông tin sức khỏe (số bước, năng lượng hoạt động) để đồng bộ.",
+        "NSHealthUpdateUsageDescription": "Ứng dụng cần quyền ghi dữ liệu dinh dưỡng (calories, carbs, protein, fat, fiber) để lưu thông tin bữa ăn."
       },
       "bundleIdentifier": "io.ai.nutrition"
     },
