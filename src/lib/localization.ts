@@ -91,6 +91,9 @@ type Dictionary = {
     dark: string;
     system: string;
     languageSection: string;
+    healthSyncSection?: string;
+    healthSyncButton?: string;
+    healthSyncing?: string;
   };
   historyPage?: {
     title: string;
@@ -214,6 +217,9 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       dark: 'Tối',
       system: 'Hệ thống',
       languageSection: 'Ngôn ngữ',
+      healthSyncSection: 'Đồng bộ sức khỏe',
+      healthSyncButton: 'Đồng bộ Apple Health',
+      healthSyncing: 'Đang đồng bộ...',
     },
   },
   us: {
@@ -314,6 +320,9 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       dark: 'Dark',
       system: 'System',
       languageSection: 'Language',
+      healthSyncSection: 'Health Sync',
+      healthSyncButton: 'Sync Apple Health',
+      healthSyncing: 'Syncing...',
     },
   },
   gb: {
@@ -453,6 +462,8 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       step2Desc: 'モデルが食材、分量、栄養素を特定します。',
       step3Title: '結果の確認',
       step3Desc: 'カロリー、タンパク質、炭水化物、脂質、健康への洞察を確認します。',
+      info: '情報',
+      logout: 'ログアウト',
     },
     result: {
       scanComplete: 'スキャン完了',
@@ -466,6 +477,31 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       fat: '脂質',
       fiber: '食物繊維',
       backToHistory: '履歴に戻る',
+    },
+    infoPage: {
+      title: 'アカウント情報',
+      fullName: '氏名',
+      email: 'メールアドレス',
+      appleID: 'Apple ID',
+      region: '国 / 地域',
+      appVersion: 'アプリバージョン',
+    },
+    settingsPage: {
+      title: '設定',
+      themeSection: 'テーマ',
+      light: 'ライト',
+      dark: 'ダーク',
+      system: 'システム',
+      languageSection: '言語',
+      healthSyncSection: 'ヘルスケア同期',
+      healthSyncButton: 'Apple Healthを同期',
+      healthSyncing: '同期中...',
+    },
+    historyPage: {
+      title: 'スキャン履歴',
+      noHistory: 'スキャン履歴はありません。',
+      scanNew: '最初の食事をスキャン',
+      searchPlaceholder: '食事名で検索...',
     },
   },
   kr: {
@@ -905,7 +941,11 @@ type FullDictionary = Dictionary & {
   scan: NonNullable<Required<Dictionary['scan']>>;
   result: NonNullable<Dictionary['result']>;
   infoPage: NonNullable<Dictionary['infoPage']>;
-  settingsPage: NonNullable<Dictionary['settingsPage']>;
+  settingsPage: NonNullable<Dictionary['settingsPage']> & {
+    healthSyncSection: string;
+    healthSyncButton: string;
+    healthSyncing: string;
+  };
   historyPage: NonNullable<Dictionary['historyPage']>;
 };
 
@@ -919,12 +959,30 @@ export function getLocale(country: CountryCode): FullDictionary {
     logout: dict.scan.logout ?? usScan.logout,
   } : usScan;
 
+  const usSettings = dictionaries.us.settingsPage!;
+  const settingsPage = dict.settingsPage ? {
+    ...usSettings,
+    ...dict.settingsPage,
+    healthSyncSection: dict.settingsPage.healthSyncSection ?? usSettings.healthSyncSection ?? "Health Sync",
+    healthSyncButton: dict.settingsPage.healthSyncButton ?? usSettings.healthSyncButton ?? "Sync Apple Health",
+    healthSyncing: dict.settingsPage.healthSyncing ?? usSettings.healthSyncing ?? "Syncing...",
+  } : {
+    ...usSettings,
+    healthSyncSection: usSettings.healthSyncSection ?? "Health Sync",
+    healthSyncButton: usSettings.healthSyncButton ?? "Sync Apple Health",
+    healthSyncing: usSettings.healthSyncing ?? "Syncing...",
+  };
+
   return {
     ...dict,
     scan: scan as Required<NonNullable<Dictionary['scan']>>,
     result: dict.result ?? dictionaries.us.result!,
     infoPage: dict.infoPage ?? dictionaries.us.infoPage!,
-    settingsPage: dict.settingsPage ?? dictionaries.us.settingsPage!,
+    settingsPage: settingsPage as Required<NonNullable<Dictionary['settingsPage']>> & {
+      healthSyncSection: string;
+      healthSyncButton: string;
+      healthSyncing: string;
+    },
     historyPage: dict.historyPage ?? dictionaries.us.historyPage!,
   };
 }

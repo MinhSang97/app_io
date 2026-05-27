@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { Laptop, Moon, Sun, Check, Heart, type LucideIcon } from 'lucide-react-native';
+import { Laptop, Moon, Sun, Check, Heart, Award, Zap, Sparkles, type LucideIcon } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View, InteractionManager, Alert, Platform } from 'react-native';
 import { getLocale, COUNTRY_OPTIONS } from '../src/lib/localization';
 import { useAuthStore } from '../src/store/auth';
@@ -25,7 +25,20 @@ export default function SettingsScreen() {
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
+  const isVn = selectedCountry === 'vn';
+
   const handleHealthSync = async () => {
+    const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'super_admin';
+    if (!isAdmin) {
+      Alert.alert(
+        isVn ? 'Giới hạn quyền truy cập' : 'Access Restricted',
+        isVn
+          ? 'Tính năng đồng bộ dữ liệu Apple HealthKit tạm thời chỉ hỗ trợ cho tài khoản Admin.'
+          : 'Syncing Apple HealthKit is currently only available for Admin accounts.'
+      );
+      return;
+    }
+
     if (isSyncing) return;
     setIsSyncing(true);
 
@@ -138,11 +151,11 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <SectionLabel palette={palette} label="Đồng bộ sức khỏe" />
+        <SectionLabel palette={palette} label={locale.settingsPage.healthSyncSection} />
         <View style={styles.options}>
           <PrimaryButton
             palette={palette}
-            label={isSyncing ? "Đang đồng bộ..." : "Đồng bộ Apple Health"}
+            label={isSyncing ? locale.settingsPage.healthSyncing : locale.settingsPage.healthSyncButton}
             onPress={handleHealthSync}
             icon={Heart}
           />
