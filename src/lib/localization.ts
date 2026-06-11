@@ -74,7 +74,34 @@ type Dictionary = {
     carbs: string;
     fat: string;
     fiber: string;
+    grade: string;
+    suggestions: string;
     backToHistory: string;
+  };
+  processing?: {
+    title: string;
+    pleaseWait: string;
+    uploading: string;
+    timeout: string;
+    failed: string;
+    retry: string;
+  };
+  alerts?: {
+    noEmail: string;
+    cancel: string;
+    logoutConfirm: string;
+    analysisFailedTitle: string;
+    analysisFailedMessage: string;
+    connectionErrorTitle: string;
+    connectionErrorMessage: string;
+    cameraPermissionTitle: string;
+    cameraPermissionMessage: string;
+    captureFailedTitle: string;
+    captureFailedMessage: string;
+    photoPermissionTitle: string;
+    photoPermissionMessage: string;
+    saveFailedTitle: string;
+    saveFailedMessage: string;
   };
   infoPage?: {
     title: string;
@@ -83,6 +110,15 @@ type Dictionary = {
     appleID: string;
     region: string;
     appVersion: string;
+    defaultUserName: string;
+    membershipVip: string;
+    collapse: string;
+    expandDetails: string;
+    vipRankLabel: string;
+    activePlanLabel: string;
+    vipPointsTemplate: string;
+    vipPointsLabel: string;
+    upgradePlan: string;
   };
   settingsPage?: {
     title: string;
@@ -194,13 +230,40 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       carbs: 'Carbs',
       fat: 'Chất béo',
       fiber: 'Chất xơ',
+      grade: 'Đánh giá',
+      suggestions: 'Lời khuyên',
       backToHistory: 'Quay lại lịch sử',
+    },
+    processing: {
+      title: 'Đang phân tích món ăn...',
+      uploading: 'Đang tải ảnh lên...',
+      timeout: 'Phân tích mất quá nhiều thời gian. Vui lòng thử lại.',
+      pleaseWait: 'Vui lòng chờ trong giây lát',
+      failed: 'Phân tích thất bại',
+      retry: 'Thử lại',
     },
     historyPage: {
       title: 'Lịch sử quét',
       noHistory: 'Chưa có lịch sử quét món ăn.',
       scanNew: 'Quét món ăn đầu tiên của bạn',
       searchPlaceholder: 'Tìm kiếm tên món ăn...',
+    },
+    alerts: {
+      noEmail: 'Không có email',
+      cancel: 'Huỷ',
+      logoutConfirm: 'Bạn có chắc muốn đăng xuất?',
+      analysisFailedTitle: 'Phân tích thất bại',
+      analysisFailedMessage: 'Không thể phân tích món ăn. Vui lòng thử lại.',
+      connectionErrorTitle: 'Lỗi kết nối',
+      connectionErrorMessage: 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối.',
+      cameraPermissionTitle: 'Cần quyền camera',
+      cameraPermissionMessage: 'Vui lòng cho phép truy cập camera để quét món ăn.',
+      captureFailedTitle: 'Chụp ảnh thất bại',
+      captureFailedMessage: 'Không thể chụp ảnh. Vui lòng thử lại.',
+      photoPermissionTitle: 'Cần quyền ảnh',
+      photoPermissionMessage: 'Vui lòng cho phép truy cập thư viện ảnh.',
+      saveFailedTitle: 'Lưu thất bại',
+      saveFailedMessage: 'Không thể lưu ảnh.',
     },
     infoPage: {
       title: 'Thông tin tài khoản',
@@ -209,6 +272,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       appleID: 'Apple ID',
       region: 'Quốc gia / Vùng',
       appVersion: 'Phiên bản ứng dụng',
+      defaultUserName: 'Người dùng',
+      membershipVip: 'Thành viên VIP',
+      collapse: 'Thu gọn',
+      expandDetails: 'Xem chi tiết',
+      vipRankLabel: 'Hạng VIP',
+      activePlanLabel: 'Gói đang dùng',
+      vipPointsTemplate: '{balance} / {total} điểm',
+      vipPointsLabel: 'Điểm VIP',
+      upgradePlan: 'Nâng cấp gói',
     },
     settingsPage: {
       title: 'Cài đặt',
@@ -297,13 +369,40 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       carbs: 'Carbs',
       fat: 'Fat',
       fiber: 'Fiber',
+      grade: 'Grade',
+      suggestions: 'Suggestions',
       backToHistory: 'Back to History',
+    },
+    processing: {
+      title: 'Analyzing your meal...',
+      uploading: 'Uploading image...',
+      timeout: 'Analysis is taking too long. Please try again.',
+      pleaseWait: 'Please wait a moment',
+      failed: 'Analysis failed',
+      retry: 'Try again',
     },
     historyPage: {
       title: 'Scan History',
       noHistory: 'No scans recorded yet.',
       scanNew: 'Scan your first meal',
       searchPlaceholder: 'Search by meal name...',
+    },
+    alerts: {
+      noEmail: 'No email',
+      cancel: 'Cancel',
+      logoutConfirm: 'Are you sure you want to log out?',
+      analysisFailedTitle: 'Analysis Failed',
+      analysisFailedMessage: 'Could not analyze the meal. Please try again.',
+      connectionErrorTitle: 'Connection Error',
+      connectionErrorMessage: 'Could not connect to the server. Please check your connection.',
+      cameraPermissionTitle: 'Camera Permission Required',
+      cameraPermissionMessage: 'Please allow camera access to scan meals.',
+      captureFailedTitle: 'Capture Failed',
+      captureFailedMessage: 'Could not capture the image. Please try again.',
+      photoPermissionTitle: 'Photo Permission Required',
+      photoPermissionMessage: 'Please allow photo library access.',
+      saveFailedTitle: 'Save Failed',
+      saveFailedMessage: 'Could not save the photo.',
     },
     infoPage: {
       title: 'Account Information',
@@ -312,6 +411,15 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       appleID: 'Apple ID',
       region: 'Country / Region',
       appVersion: 'App Version',
+      defaultUserName: 'User',
+      membershipVip: 'VIP Membership',
+      collapse: 'Collapse',
+      expandDetails: 'Expand details',
+      vipRankLabel: 'VIP Rank',
+      activePlanLabel: 'Active Plan',
+      vipPointsTemplate: '{balance} / {total} pts',
+      vipPointsLabel: 'VIP Points',
+      upgradePlan: 'Upgrade Plan',
     },
     settingsPage: {
       title: 'Settings',
@@ -398,7 +506,17 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       carbs: 'Carbs',
       fat: 'Fat',
       fiber: 'Fiber',
+      grade: 'Grade',
+      suggestions: 'Suggestions',
       backToHistory: 'Back to History',
+    },
+    processing: {
+      title: 'Analyzing your meal...',
+      uploading: 'Uploading image...',
+      timeout: 'Analysis is taking too long. Please try again.',
+      pleaseWait: 'Please wait a moment',
+      failed: 'Analysis failed',
+      retry: 'Try again',
     },
   },
   jp: {
@@ -476,7 +594,17 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       carbs: '炭水化物',
       fat: '脂質',
       fiber: '食物繊維',
+      grade: 'グレード',
+      suggestions: 'アドバイス',
       backToHistory: '履歴に戻る',
+    },
+    processing: {
+      title: '食事を分析中...',
+      uploading: '画像をアップロード中...',
+      timeout: '分析に時間がかかりすぎています。もう一度お試しください。',
+      pleaseWait: '少々お待ちください',
+      failed: '分析に失敗しました',
+      retry: '再試行',
     },
     infoPage: {
       title: 'アカウント情報',
@@ -577,7 +705,17 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       carbs: '탄수화물',
       fat: '지방',
       fiber: '식이섬유',
+      grade: '등급',
+      suggestions: '제안',
       backToHistory: '기록으로 돌아가기',
+    },
+    processing: {
+      title: '식사 분석 중...',
+      uploading: '이미지 업로드 중...',
+      timeout: '분석 시간이 너무 오래 걸립니다. 다시 시도하세요.',
+      pleaseWait: '잠시 기다려 주세요',
+      failed: '분석 실패',
+      retry: '다시 시도',
     },
   },
   cn: {
@@ -653,7 +791,17 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       carbs: '碳水化合物',
       fat: '脂肪',
       fiber: '膳食纤维',
+      grade: '评级',
+      suggestions: '建议',
       backToHistory: '返回历史记录',
+    },
+    processing: {
+      title: '正在分析您的餐食...',
+      uploading: '正在上传图片...',
+      timeout: '分析花费时间太长，请重试。',
+      pleaseWait: '请稍候',
+      failed: '分析失败',
+      retry: '重试',
     },
   },
   fr: {
@@ -916,7 +1064,17 @@ const dictionaries: Record<CountryCode, Dictionary> = {
       carbs: 'คาร์โบไฮเดรต',
       fat: 'ไขมัน',
       fiber: 'ใยอาหาร',
+      grade: 'เกรด',
+      suggestions: 'คำแนะนำ',
       backToHistory: 'กลับไปที่ประวัติ',
+    },
+    processing: {
+      title: 'กำลังวิเคราะห์อาหาร...',
+      uploading: 'กำลังอัปโหลดรูปภาพ...',
+      timeout: 'การวิเคราะห์ใช้เวลานานเกินไป กรุณาลองใหม่',
+      pleaseWait: 'กรุณารอสักครู่',
+      failed: 'การวิเคราะห์ล้มเหลว',
+      retry: 'ลองใหม่',
     },
     infoPage: {
       title: 'ข้อมูลบัญชี',
@@ -938,8 +1096,10 @@ const dictionaries: Record<CountryCode, Dictionary> = {
 };
 
 type FullDictionary = Dictionary & {
+  alerts: NonNullable<Dictionary['alerts']>;
   scan: NonNullable<Required<Dictionary['scan']>>;
   result: NonNullable<Dictionary['result']>;
+  processing: NonNullable<Dictionary['processing']>;
   infoPage: NonNullable<Dictionary['infoPage']>;
   settingsPage: NonNullable<Dictionary['settingsPage']> & {
     healthSyncSection: string;
@@ -975,9 +1135,11 @@ export function getLocale(country: CountryCode): FullDictionary {
 
   return {
     ...dict,
+    alerts: dict.alerts ?? dictionaries.us.alerts!,
     scan: scan as Required<NonNullable<Dictionary['scan']>>,
     result: dict.result ?? dictionaries.us.result!,
-    infoPage: dict.infoPage ?? dictionaries.us.infoPage!,
+    processing: dict.processing ?? dictionaries.us.processing!,
+    infoPage: dict.infoPage ? { ...dictionaries.us.infoPage!, ...dict.infoPage } : dictionaries.us.infoPage!,
     settingsPage: settingsPage as Required<NonNullable<Dictionary['settingsPage']>> & {
       healthSyncSection: string;
       healthSyncButton: string;

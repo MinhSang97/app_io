@@ -1,4 +1,5 @@
-/** API paths & URL helpers — base từ EXPO_PUBLIC_API_URL (đã gồm /api/v1). */
+/** API paths & URL helpers */
+import Constants from 'expo-constants';
 
 function combinePath<T extends Record<string, string>, K extends keyof T>(
   base: string,
@@ -12,13 +13,39 @@ function combinePath<T extends Record<string, string>, K extends keyof T>(
   return result as { [P in K]: string };
 }
 
-const apiBase = process.env.EXPO_PUBLIC_API_URL?.trim();
-if (!apiBase) {
+/**
+ * Resolve API base URL:
+ * - Có EXPO_PUBLIC_API_URL (dev/prod có domain): dùng luôn.
+ * - Không có (local): lấy IP động từ Metro bundler host —
+ *   tránh hardcode IP vì đổi mạng/wifi là đổi IP.
+ */
+function resolveApiBase(): string {
+  const envBase = process.env.EXPO_PUBLIC_API_URL?.trim();
+  if (envBase) return envBase;
+
+  // Local only: detect IP từ Expo Metro host
+  const metroHost = Constants.expoConfig?.hostUri?.split(':')[0];
+  if (metroHost) return `http://${metroHost}/api/v1`;
+
   throw new Error('EXPO_PUBLIC_API_URL is not configured');
 }
 
-/** Axios baseURL — ví dụ http://192.168.1.153:2003/api/v1 */
+const apiBase = resolveApiBase();
+
+if (__DEV__) {
+  console.log('[urls] API_BASE_URL =', apiBase);
+  console.log('[urls] hostUri =', Constants.expoConfig?.hostUri);
+}
+
+/** Axios baseURL — tự động theo IP máy dev hoặc EXPO_PUBLIC_API_URL (prod) */
 export const API_BASE_URL = apiBase;
+
+/** AI service đi qua cùng API gateway — cùng base URL */
+export const AI_BASE_URL = apiBase;
+
+export const AI_PATHS = {
+  ANALYZE_SSE: '/analyzer',
+} as const;
 
 /** Path tương đối (dùng với axios baseURL). */
 export const USER_PATHS = {
@@ -90,5 +117,27 @@ export const SCAN_PATHS = {
 export const SCAN = combinePath<typeof SCAN_PATHS, keyof typeof SCAN_PATHS>(
   API_BASE_URL,
   SCAN_PATHS,
+);
+
+export const SUBSCRIPTION_PATHS = {
+  PLANS: '/subscriptions/list',
+  PURCHASE: '/subscriptions/purchase',
+} as const;
+
+export const SUBSCRIPTION = combinePath<typeof SUBSCRIPTION_PATHS, keyof typeof SUBSCRIPTION_PATHS>(
+  API_BASE_URL,
+  SUBSCRIPTION_PATHS,
+);
+
+export const VIP_PATHS = {
+  RANKS: '/vip-ranks/list',
+  REWARDS: '/vip-rewards/list',
+  REDEEM: '/vip-rewards/redeem',
+  HISTORY: '/vip-rewards/history',
+} as const;
+
+export const VIP = combinePath<typeof VIP_PATHS, keyof typeof VIP_PATHS>(
+  API_BASE_URL,
+  VIP_PATHS,
 );
 

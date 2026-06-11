@@ -4,6 +4,7 @@ import { USER_PATHS } from '@/src/config/urls';
 import type { IApiResponse, UserApiResult } from '@/src/interfaces/api-response';
 import axiosInstance from '@/src/lib/axios';
 
+import type { OAuthLoginUser } from '@/src/interfaces/oauth';
 import { parseApiErrorMessage } from './parse-api-error';
 
 export const update_user_theme = async (
@@ -32,9 +33,9 @@ export const update_user_theme = async (
 
 export const update_user_locale = async (
   locale: number,
-): Promise<UserApiResult<void>> => {
+): Promise<UserApiResult<OAuthLoginUser>> => {
   try {
-    const response = await axiosInstance.put<IApiResponse<void>>(
+    const response = await axiosInstance.put<IApiResponse<OAuthLoginUser>>(
       `${USER_PATHS.ME}/locale`,
       { locale },
     );

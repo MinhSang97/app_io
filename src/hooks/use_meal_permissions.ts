@@ -32,10 +32,8 @@ export async function getPermissionSnapshot(): Promise<MealPermissionsState> {
 }
 
 async function requestPermissions(): Promise<MealPermissionsState> {
-  const [cameraPermission, mediaPermission] = await Promise.all([
-    Camera.requestCameraPermissionsAsync(),
-    ImagePicker.requestMediaLibraryPermissionsAsync(),
-  ]);
+  const cameraPermission = await Camera.requestCameraPermissionsAsync();
+  const mediaPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
   return {
     cameraGranted: cameraPermission.status === 'granted',

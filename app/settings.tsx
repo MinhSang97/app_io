@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { Laptop, Moon, Sun, Check, Heart, Award, Zap, Sparkles, type LucideIcon } from 'lucide-react-native';
+import { Laptop, Moon, Sun, Check, Heart, type LucideIcon } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View, InteractionManager, Alert, Platform } from 'react-native';
 import { getLocale, COUNTRY_OPTIONS } from '../src/lib/localization';
 import { useAuthStore } from '../src/store/auth';
@@ -10,6 +10,7 @@ import { update_user_theme, update_user_locale } from '../src/apis/user';
 import { THEME_BY_TYPE, LOCALE_BY_COUNTRY } from '../src/constants/user_preferences';
 import { BackHeader, radius, Screen, SectionLabel, spacing, SelectField, BottomSheet, PrimaryButton } from '@/src/ui';
 import { syncAppleHealth } from '../src/lib/health_sync';
+import { oauthUserToUserInformation } from '../src/lib/session_refresh';
 
 export default function SettingsScreen() {
   const selectedCountry = useAuthStore((state) => state.selectedCountry);
@@ -21,20 +22,17 @@ export default function SettingsScreen() {
   const { theme, setTheme } = useThemeStore();
   const { palette } = useAppTheme();
   const locale = getLocale(selectedCountry);
+  const isVn = selectedCountry === 'vn';
 
   const [countryPickerOpen, setCountryPickerOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-
-  const isVn = selectedCountry === 'vn';
 
   const handleHealthSync = async () => {
     const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'super_admin';
     if (!isAdmin) {
       Alert.alert(
-        isVn ? 'Giới hạn quyền truy cập' : 'Access Restricted',
-        isVn
-          ? 'Tính năng đồng bộ dữ liệu Apple HealthKit tạm thời chỉ hỗ trợ cho tài khoản Admin.'
-          : 'Syncing Apple HealthKit is currently only available for Admin accounts.'
+        locale.alerts.accessRestrictedTitle,
+        locale.alerts.accessRestrictedMessage
       );
       return;
     }
@@ -90,7 +88,13 @@ export default function SettingsScreen() {
       });
 
       void update_user_locale(localeCode).then((res) => {
-        if (!res.success) {
+        if (res.success && res.data?.data) {
+          const data = res.data.data;
+          const csrfToken = data.csrf_token.trim();
+          const state = useAuthStore.getState();
+          const updatedUser = oauthUserToUserInformation(data, state.user);
+          state.setSession({ user: updatedUser, csrfToken });
+        } else {
           console.warn('[Settings] Failed to sync locale to backend:', res.error);
         }
       });

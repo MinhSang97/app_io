@@ -89,9 +89,9 @@ export default function ScanScreen() {
   const handleLogout = () => {
     Alert.alert(
       locale.scan.logout,
-      selectedCountry === 'vn' ? 'Bạn có chắc chắn muốn đăng xuất không?' : 'Are you sure you want to log out?',
+      locale.alerts.logoutConfirm,
       [
-        { text: selectedCountry === 'vn' ? 'Hủy' : 'Cancel', style: 'cancel' },
+        { text: locale.alerts.cancel, style: 'cancel' },
         { 
           text: locale.scan.logout, 
           style: 'destructive',
@@ -139,20 +139,28 @@ export default function ScanScreen() {
       const res = await createScan(params);
       if (res.success && res.data?.data?.id) {
         setPickedImageUris([]);
+        setIsScanning(false);
+        const scan = res.data.data;
+        // Cached result: same image already analyzed — skip processing screen
+        if (scan.status === 'completed' && scan.analysis) {
+          router.push({ pathname: '/result', params: { id: scan.id } });
+          return;
+        }
         router.push({
-          pathname: '/result',
-          params: { id: res.data.data.id },
+          pathname: '/processing',
+          params: { id: scan.id },
         });
+        return;
       } else {
         Alert.alert(
-          selectedCountry === 'vn' ? 'Lỗi phân tích' : 'Analysis Failed',
-          res.error || (selectedCountry === 'vn' ? 'Đã xảy ra lỗi khi phân tích món ăn.' : 'Failed to analyze the meal. Please try again.')
+          locale.alerts.analysisFailedTitle,
+          res.error || locale.alerts.analysisFailedMessage
         );
       }
     } catch (err: any) {
       Alert.alert(
-        selectedCountry === 'vn' ? 'Lỗi kết nối' : 'Connection Error',
-        err.message || (selectedCountry === 'vn' ? 'Đã xảy ra lỗi khi kết nối với máy chủ.' : 'Connection error. Please try again.')
+        locale.alerts.connectionErrorTitle,
+        err.message || locale.alerts.connectionErrorMessage
       );
     } finally {
       setIsScanning(false);
@@ -197,7 +205,7 @@ export default function ScanScreen() {
     if (!cameraPermission?.granted) {
       const result = await requestCameraPermission();
       if (!result.granted) {
-        Alert.alert('Camera permission required', 'Please allow camera access to take photos.');
+        Alert.alert(locale.alerts.cameraPermissionTitle, locale.alerts.cameraPermissionMessage);
         return;
       }
     }
@@ -211,7 +219,7 @@ export default function ScanScreen() {
       setCapturedImageUri(photo.uri);
       setSavePromptVisible(true);
     } catch {
-      Alert.alert('Capture failed', 'Could not take a photo. Please try again.');
+      Alert.alert(locale.alerts.captureFailedTitle, locale.alerts.captureFailedMessage);
     }
   };
 
@@ -221,7 +229,7 @@ export default function ScanScreen() {
       const permission = await MediaLibrary.getPermissionsAsync();
       const hasPermission = permission.granted || (await MediaLibrary.requestPermissionsAsync()).granted;
       if (!hasPermission) {
-        Alert.alert('Permission required', 'Please allow photo library access to save the image.');
+        Alert.alert(locale.alerts.photoPermissionTitle, locale.alerts.photoPermissionMessage);
         return;
       }
 
@@ -231,7 +239,7 @@ export default function ScanScreen() {
       setPickedImageUris((prev) => [...prev, capturedImageUri]);
       setCapturedImageUri(null);
     } catch {
-      Alert.alert('Save failed', 'Could not save the photo to your library.');
+      Alert.alert(locale.alerts.saveFailedTitle, locale.alerts.saveFailedMessage);
     }
   };
 
@@ -357,7 +365,7 @@ export default function ScanScreen() {
                   {user?.username?.trim() || 'F Calories User'}
                 </Text>
                 <Text className={`text-xs mt-1 text-center ${colors.subText}`} numberOfLines={1}>
-                  {user?.email?.trim() || 'No email shared'}
+                  {user?.email?.trim() || locale.alerts.noEmail}
                 </Text>
               </View>
  
@@ -498,10 +506,10 @@ export default function ScanScreen() {
           <View className="w-full max-w-[280px] rounded-[28px] border border-white/10 bg-zinc-950 p-6 items-center">
             <ActivityIndicator size="large" color="#34d399" />
             <Text className="mt-4 text-center text-base font-bold text-white">
-              {selectedCountry === 'vn' ? 'AI đang phân tích món ăn...' : 'AI is analyzing your meal...'}
+              {locale.processing.uploading}
             </Text>
             <Text className="mt-2 text-center text-xs text-zinc-400">
-              {selectedCountry === 'vn' ? 'Vui lòng chờ trong giây lát' : 'Please wait a moment'}
+              {locale.processing.pleaseWait}
             </Text>
           </View>
         </View>

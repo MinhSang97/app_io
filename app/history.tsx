@@ -16,6 +16,7 @@ import {
 import { listScans } from '../src/apis/scan';
 import { useAppTheme } from '../src/hooks/use_app_theme';
 import type { Scan } from '../src/interfaces/scan';
+import { DATE_LOCALE_BY_COUNTRY } from '../src/constants/countries';
 import { getLocale } from '../src/lib/localization';
 import { useAuthStore } from '../src/store/auth';
 import { AppCard, BackHeader, Screen, radius, spacing } from '@/src/ui';
@@ -89,7 +90,7 @@ export default function HistoryScreen() {
   const formatDate = (dateStr: string) => {
     try {
       const date = new Date(dateStr);
-      return date.toLocaleDateString(selectedCountry === 'vn' ? 'vi-VN' : 'en-US', {
+      return date.toLocaleDateString(DATE_LOCALE_BY_COUNTRY[selectedCountry], {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
@@ -178,7 +179,7 @@ export default function HistoryScreen() {
                   {/* Info */}
                   <View style={styles.infoCol}>
                     <Text style={[styles.mealName, { color: palette.text }]} numberOfLines={1}>
-                      {item.analysis.meal_name}
+                      {item.analysis?.meal_name ?? '—'}
                     </Text>
                     <Text style={[styles.dateText, { color: palette.subText }]}>
                       {formatDate(item.created_at)}
@@ -186,21 +187,29 @@ export default function HistoryScreen() {
 
                     {/* Macro chips */}
                     <View style={styles.chipsRow}>
-                      <View style={[styles.chip, { backgroundColor: palette.accentSoft }]}>
-                        <Text style={[styles.chipText, { color: palette.accentText }]}>
-                          {item.analysis.calories} kcal
-                        </Text>
-                      </View>
-                      <View style={[styles.chip, { backgroundColor: palette.accentSoft }]}>
-                        <Text style={[styles.chipText, { color: palette.accentText }]}>
-                          {item.analysis.protein}g P
-                        </Text>
-                      </View>
-                      <View style={[styles.chip, { backgroundColor: palette.accentSoft }]}>
-                        <Text style={[styles.chipText, { color: palette.accentText }]}>
-                          {item.analysis.carbs}g C
-                        </Text>
-                      </View>
+                      {item.analysis ? (
+                        <>
+                          <View style={[styles.chip, { backgroundColor: palette.accentSoft }]}>
+                            <Text style={[styles.chipText, { color: palette.accentText }]}>
+                              {item.analysis.calories} kcal
+                            </Text>
+                          </View>
+                          <View style={[styles.chip, { backgroundColor: palette.accentSoft }]}>
+                            <Text style={[styles.chipText, { color: palette.accentText }]}>
+                              {item.analysis.protein}g P
+                            </Text>
+                          </View>
+                          <View style={[styles.chip, { backgroundColor: palette.accentSoft }]}>
+                            <Text style={[styles.chipText, { color: palette.accentText }]}>
+                              {item.analysis.carbs}g C
+                            </Text>
+                          </View>
+                        </>
+                      ) : (
+                        <View style={[styles.chip, { backgroundColor: palette.accentSoft }]}>
+                          <Text style={[styles.chipText, { color: palette.accentText }]}>Pending...</Text>
+                        </View>
+                      )}
                     </View>
                   </View>
 

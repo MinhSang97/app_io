@@ -68,7 +68,7 @@ export default function PermissionsScreen() {
     try {
       await Linking.openSettings();
     } catch {
-      Alert.alert('Settings', 'Please open Settings manually to enable permissions.');
+      Alert.alert(locale.permissions.openSettings, locale.alerts.settingsManual);
     }
   };
 

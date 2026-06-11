@@ -29,6 +29,7 @@ export type OAuthLoginUser = {
   avatar_link: string;
   role: string;
   csrf_token: string;
+  locale?: number;
 };
 
 /** Payload refresh token (cùng shape login response). */

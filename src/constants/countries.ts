@@ -16,3 +16,19 @@ export const COUNTRY_OPTIONS: Array<{ code: CountryCode; label: string }> = [
 ];
 
 export const DEFAULT_COUNTRY: CountryCode = 'vn';
+
+/** BCP 47 tags for `toLocaleDateString` per country selection. */
+export const DATE_LOCALE_BY_COUNTRY: Record<CountryCode, string> = {
+  vn: 'vi-VN',
+  us: 'en-US',
+  gb: 'en-GB',
+  jp: 'ja-JP',
+  kr: 'ko-KR',
+  cn: 'zh-CN',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  es: 'es-ES',
+  pt: 'pt-PT',
+  id: 'id-ID',
+  th: 'th-TH',
+};

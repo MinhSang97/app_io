@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { Check, ShieldAlert, Sparkles, Award, Zap, Heart, CheckCircle2 } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View, Alert, ActivityIndicator, ScrollView } from 'react-native';
@@ -6,82 +6,45 @@ import { getLocale } from '../src/lib/localization';
 import { useAuthStore } from '../src/store/auth';
 import { useAppTheme } from '../src/hooks/use_app_theme';
 import { BackHeader, radius, Screen, spacing, PrimaryButton } from '@/src/ui';
+import { listPlans, purchaseSubscription } from '../src/apis/subscription';
+import { syncUserProfileFromServer } from '../src/lib/user_profile';
+import type { SubscriptionPlan } from '../src/interfaces/subscription';
 
-interface Plan {
-  code: string;
-  name: string;
-  price: string;
-  points: number;
-  maxScans: string;
-  aiNutritionist: boolean;
-  historyLimit: string;
-  healthSync: boolean;
-  color: string;
-  badge: string;
-}
+const planConfigs: Record<string, { color: string; badge: string }> = {
+  basic: { color: '#71717a', badge: 'BASIC' },
+  plus: { color: '#3b82f6', badge: 'POPULAR' },
+  pro: { color: '#8b5cf6', badge: 'RECOMMENDED' },
+  ultra: { color: '#ec4899', badge: 'ULTIMATE' },
+};
 
 export default function PaywallScreen() {
   const selectedCountry = useAuthStore((state) => state.selectedCountry);
   const user = useAuthStore((state) => state.user);
-  const setUser = useAuthStore((state) => state.setUser);
   const { palette } = useAppTheme();
   const locale = getLocale(selectedCountry);
 
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [loadingPlans, setLoadingPlans] = useState<boolean>(true);
   const [selectedPlanCode, setSelectedPlanCode] = useState<string>('pro');
   const [loading, setLoading] = useState<boolean>(false);
 
   const isVn = selectedCountry === 'vn';
 
-  const plans: Plan[] = [
-    {
-      code: 'basic',
-      name: 'Basic',
-      price: isVn ? 'Miễn phí' : 'Free',
-      points: 0,
-      maxScans: '3 scans/ngày',
-      aiNutritionist: false,
-      historyLimit: isVn ? '7 ngày' : '7 days',
-      healthSync: false,
-      color: '#71717a',
-      badge: 'BASIC',
-    },
-    {
-      code: 'plus',
-      name: 'Plus',
-      price: '$9.99',
-      points: 100,
-      maxScans: '10 scans/ngày',
-      aiNutritionist: true,
-      historyLimit: isVn ? '30 ngày' : '30 days',
-      healthSync: true,
-      color: '#3b82f6',
-      badge: 'POPULAR',
-    },
-    {
-      code: 'pro',
-      name: 'Pro',
-      price: '$19.99',
-      points: 300,
-      maxScans: '20 scans/ngày',
-      aiNutritionist: true,
-      historyLimit: isVn ? '90 ngày' : '90 days',
-      healthSync: true,
-      color: '#8b5cf6',
-      badge: 'RECOMMENDED',
-    },
-    {
-      code: 'ultra',
-      name: 'Ultra',
-      price: '$39.99',
-      points: 1000,
-      maxScans: '30 scans/ngày',
-      aiNutritionist: true,
-      historyLimit: isVn ? 'Không giới hạn' : 'Unlimited',
-      healthSync: true,
-      color: '#ec4899',
-      badge: 'ULTIMATE',
-    },
-  ];
+  useEffect(() => {
+    const fetchPlans = async () => {
+      const res = await listPlans();
+      if (res.success && res.data?.data) {
+        setPlans(res.data.data);
+      } else {
+        Alert.alert(
+          isVn ? 'Lỗi' : 'Error',
+          res.error || (isVn ? 'Không tải được danh sách gói.' : 'Failed to load plans.')
+        );
+      }
+      setLoadingPlans(false);
+    };
+    fetchPlans();
+  }, [isVn]);
 
   const planNames: Record<string, Record<string, string>> = {
     basic: {
@@ -97,7 +60,7 @@ export default function PaywallScreen() {
       fr: 'Pro', de: 'Pro', es: 'Pro', pt: 'Pro', id: 'Pro', th: 'โปร'
     },
     ultra: {
-      vn: 'Ultra', us: 'Ultra', gb: 'Ultra', jp: 'ウルトラ', kr: '울트라', cn: 'Ultra',
+      vn: 'Ultra', us: 'Ultra', gb: 'Ultra', jp: 'ウルトラ', kr: '울特拉', cn: 'Ultra',
       fr: 'Ultra', de: 'Ultra', es: 'Ultra', pt: 'Ultra', id: 'Ultra', th: 'อัลตรา'
     }
   };
@@ -106,32 +69,44 @@ export default function PaywallScreen() {
     return planNames[code]?.[selectedCountry] || planNames[code]?.['us'] || fallback;
   };
 
-  const currentPlan = plans.find((p) => p.code === selectedPlanCode) || plans[2];
+  const getPlanColor = (code: string) => planConfigs[code]?.color || '#71717a';
+  const getPlanBadge = (code: string) => planConfigs[code]?.badge || 'VIP';
 
-  const getVipRankName = (points: number): string => {
-    if (points >= 3500) return 'Diamond';
-    if (points >= 1500) return 'Platinum';
-    if (points >= 250) return 'Gold';
-    if (points >= 150) return 'Silver';
-    return 'Bronze';
+  const formatHistoryLimit = (limit: number) => {
+    if (limit === -1) return isVn ? 'Không giới hạn' : 'Unlimited';
+    return isVn ? `${limit} ngày` : `${limit} days`;
   };
+
+  const formatMaxScans = (max: number) => {
+    return isVn ? `${max} scans/ngày` : `${max} scans/day`;
+  };
+
+  const currentPlan = plans.find((p) => p.code === selectedPlanCode) || plans[0];
 
   const getPlanLevel = (code?: string): number => {
     switch (code) {
       case 'ultra': return 3;
       case 'pro': return 2;
       case 'plus': return 1;
-      case 'individuals':
+      case 'basic':
       default:
         return 0;
     }
   };
 
   const handlePurchase = () => {
-    const userPlanLevel = getPlanLevel(user?.subscription_tier);
+    if (!user) {
+      Alert.alert(
+        isVn ? 'Lỗi' : 'Error',
+        isVn ? 'Vui lòng đăng nhập để nâng cấp.' : 'Please log in to upgrade.'
+      );
+      return;
+    }
+
+    const userPlanLevel = getPlanLevel(user.subscription_tier);
     const selectedPlanLevel = getPlanLevel(selectedPlanCode);
 
-    if (user?.subscription_tier === selectedPlanCode) {
+    if (user.subscription_tier === selectedPlanCode) {
       Alert.alert(
         isVn ? 'Gói hiện tại' : 'Current Plan',
         isVn ? 'Bạn đang sử dụng gói này rồi.' : 'You are already subscribed to this plan.'
@@ -149,56 +124,69 @@ export default function PaywallScreen() {
       return;
     }
 
+    const isAdmin = user.role === 'admin' || user.role === 'superadmin' || user.role === 'super_admin';
+    if (!isAdmin) {
+      Alert.alert(
+        isVn ? 'Không có quyền' : 'Access Denied',
+        isVn
+          ? 'Tài khoản thường không thể thực hiện mock purchase. Vui lòng liên hệ Admin để được nâng cấp.'
+          : 'Standard accounts cannot perform mock purchases. Please contact Admin to upgrade.'
+      );
+      return;
+    }
+
     setLoading(true);
 
-    // Giả lập xử lý thanh toán (Mock Purchase)
-    setTimeout(() => {
-      setLoading(false);
-      if (!user) {
+    void purchaseSubscription({
+      plan_code: selectedPlanCode,
+      payment_provider: 1, // Mock
+      payment_id: `tx_mock_${Date.now()}`,
+    }).then(async (res) => {
+      if (res.success && res.data?.data) {
+        // Sync user profile from server
+        await syncUserProfileFromServer({ force: true });
+        setLoading(false);
+
+        const planInfo = plans.find((p) => p.code === selectedPlanCode);
+        const localizedName = planInfo ? getPlanDisplayName(planInfo.code, planInfo.name) : selectedPlanCode;
+
+        Alert.alert(
+          isVn ? 'Thành công (API Mock)' : 'Success (API Mock)',
+          isVn
+            ? `Nâng cấp thành công lên gói ${localizedName}!\nBạn được cộng +${planInfo?.vip_points_reward || 0} điểm VIP.\n(Đã đồng bộ lên server)`
+            : `Successfully upgraded to ${localizedName} plan!\nYou received +${planInfo?.vip_points_reward || 0} VIP points.\n(Synced to server)`
+        );
+        router.back();
+      } else {
+        setLoading(false);
         Alert.alert(
           isVn ? 'Lỗi' : 'Error',
-          isVn ? 'Vui lòng đăng nhập để nâng cấp.' : 'Please log in to upgrade.'
-        );
-        return;
-      }
-
-      const planInfo = plans.find((p) => p.code === selectedPlanCode);
-      if (!planInfo) return;
-
-      const newEarnedPoints = (user.vip_points_earned || 0) + planInfo.points;
-      const newBalancePoints = (user.vip_points_balance || 0) + planInfo.points;
-      const newRank = getVipRankName(newEarnedPoints);
-
-      const isAdmin = user.role === 'admin' || user.role === 'superadmin' || user.role === 'super_admin';
-
-      // Cập nhật state local
-      setUser({
-        ...user,
-        subscription_tier: selectedPlanCode,
-        vip_points_earned: newEarnedPoints,
-        vip_points_balance: newBalancePoints,
-        vip_rank: newRank,
-      });
-
-      const localizedName = getPlanDisplayName(planInfo.code, planInfo.name);
-      if (isAdmin) {
-        Alert.alert(
-          isVn ? 'Thành công (Admin Mock)' : 'Success (Admin Mock)',
-          isVn
-            ? `Nâng cấp thành công lên gói ${localizedName}!\nBạn được cộng +${planInfo.points} điểm VIP.\n(Đã đồng bộ Mock lên client local)`
-            : `Successfully upgraded to ${localizedName} plan!\nYou received +${planInfo.points} VIP points.\n(Mock synced to local client)`
-        );
-      } else {
-        Alert.alert(
-          isVn ? 'Đăng ký Demo thành công' : 'Demo Subscription Success',
-          isVn
-            ? `Ứng dụng đang ở chế độ UI Demo.\nBạn đã được nâng cấp lên gói ${localizedName} (+${planInfo.points} điểm VIP) trên bộ nhớ máy để kiểm tra giao diện.\n\n* Cần tài khoản Admin để Test API Mock thực tế.`
-            : `App is in UI Demo mode.\nYou have been upgraded to ${localizedName} (+${planInfo.points} VIP points) locally to test the UI.\n\n* Admin account required to test actual backend Mock API.`
+          res.error || (isVn ? 'Thanh toán thất bại.' : 'Payment failed.')
         );
       }
-      router.back();
-    }, 1200);
+    }).catch((err) => {
+      setLoading(false);
+      Alert.alert(
+        isVn ? 'Lỗi' : 'Error',
+        isVn ? 'Đã có lỗi xảy ra kết nối đến máy chủ.' : 'An error occurred while connecting to server.'
+      );
+    });
   };
+
+  if (loadingPlans) {
+    return (
+      <Screen palette={palette}>
+        <BackHeader
+          palette={palette}
+          title={isVn ? 'Thành viên VIP' : 'VIP Subscription'}
+          onBack={() => router.back()}
+        />
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={palette.accent} />
+        </View>
+      </Screen>
+    );
+  }
 
   return (
     <Screen palette={palette} scrollable={true}>
@@ -229,7 +217,12 @@ export default function PaywallScreen() {
         {plans.map((plan) => {
           const isSelected = selectedPlanCode === plan.code;
           const isUserPlan = user?.subscription_tier === plan.code || (!user?.subscription_tier && plan.code === 'basic');
-          
+          const planColor = getPlanColor(plan.code);
+          const planBadge = getPlanBadge(plan.code);
+          const displayPrice = plan.price === 0
+            ? (isVn ? 'Miễn phí' : 'Free')
+            : `$${plan.price}`;
+
           return (
             <Pressable
               key={plan.code}
@@ -238,15 +231,15 @@ export default function PaywallScreen() {
                 styles.planCard,
                 {
                   backgroundColor: palette.cardBg,
-                  borderColor: isSelected ? plan.color : palette.border,
+                  borderColor: isSelected ? planColor : palette.border,
                   borderWidth: isSelected ? 2 : 1,
                   shadowColor: palette.shadow,
                 },
               ]}
             >
-              <View style={[styles.planBadgeContainer, { backgroundColor: isSelected ? plan.color : 'transparent' }]}>
+              <View style={[styles.planBadgeContainer, { backgroundColor: isSelected ? planColor : 'transparent' }]}>
                 <Text style={[styles.planBadgeText, { color: isSelected ? '#ffffff' : palette.muted }]}>
-                  {plan.badge}
+                  {planBadge}
                 </Text>
               </View>
 
@@ -254,16 +247,16 @@ export default function PaywallScreen() {
                 {getPlanDisplayName(plan.code, plan.name)}
               </Text>
               
-              <Text style={[styles.planPrice, { color: plan.color }]}>{plan.price}</Text>
+              <Text style={[styles.planPrice, { color: planColor }]}>{displayPrice}</Text>
               <Text style={[styles.planPeriod, { color: palette.muted }]}>
                 {plan.code === 'basic' ? '' : (isVn ? '/tháng' : '/month')}
               </Text>
 
-              {plan.points > 0 && (
+              {plan.vip_points_reward > 0 && (
                 <View style={[styles.pointBadge, { backgroundColor: palette.accentSoft }]}>
                   <Award size={13} color={palette.accent} />
                   <Text style={[styles.pointBadgeText, { color: palette.accentText }]}>
-                    +{plan.points} VIP Pts
+                    +{plan.vip_points_reward} VIP Pts
                   </Text>
                 </View>
               )}
@@ -282,70 +275,76 @@ export default function PaywallScreen() {
       </ScrollView>
 
       {/* Chi tiết tính năng của gói đang chọn */}
-      <View style={[styles.detailSection, { backgroundColor: palette.cardBg, borderColor: palette.border }]}>
-        <View style={styles.detailHeader}>
-          <Zap size={18} color={currentPlan.color} />
-          <Text style={[styles.detailTitle, { color: palette.text }]}>
-            {isVn
-              ? `Chi tiết gói: ${getPlanDisplayName(currentPlan.code, currentPlan.name)}`
-              : `Features: ${getPlanDisplayName(currentPlan.code, currentPlan.name)}`}
-          </Text>
-        </View>
+      {currentPlan && (
+        <View style={[styles.detailSection, { backgroundColor: palette.cardBg, borderColor: palette.border }]}>
+          <View style={styles.detailHeader}>
+            <Zap size={18} color={getPlanColor(currentPlan.code)} />
+            <Text style={[styles.detailTitle, { color: palette.text }]}>
+              {isVn
+                ? `Chi tiết gói: ${getPlanDisplayName(currentPlan.code, currentPlan.name)}`
+                : `Features: ${getPlanDisplayName(currentPlan.code, currentPlan.name)}`}
+            </Text>
+          </View>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
 
-        <View style={styles.featureRow}>
-          <Check size={16} color={palette.accent} />
-          <Text style={[styles.featureText, { color: palette.text }]}>
-            {isVn ? 'Giới hạn quét:' : 'Scan limit:'}{' '}
-            <Text style={{ fontWeight: '700', color: currentPlan.color }}>{currentPlan.maxScans}</Text>
-          </Text>
-        </View>
-
-        <View style={styles.featureRow}>
-          {currentPlan.aiNutritionist ? (
+          <View style={styles.featureRow}>
             <Check size={16} color={palette.accent} />
-          ) : (
-            <Text style={[styles.bulletNo, { color: palette.danger }]}>✕</Text>
-          )}
-          <Text style={[styles.featureText, { color: currentPlan.aiNutritionist ? palette.text : palette.muted }]}>
-            {isVn ? 'Chuyên gia dinh dưỡng AI (Tư vấn trực tiếp)' : 'AI Nutritionist Advice (Chatbot)'}
-          </Text>
-        </View>
+            <Text style={[styles.featureText, { color: palette.text }]}>
+              {isVn ? 'Giới hạn quét:' : 'Scan limit:'}{' '}
+              <Text style={{ fontWeight: '700', color: getPlanColor(currentPlan.code) }}>
+                {formatMaxScans(currentPlan.features.max_scans_per_day)}
+              </Text>
+            </Text>
+          </View>
 
-        <View style={styles.featureRow}>
-          {currentPlan.healthSync ? (
+          <View style={styles.featureRow}>
+            {currentPlan.features.has_ai_nutritionist ? (
+              <Check size={16} color={palette.accent} />
+            ) : (
+              <Text style={[styles.bulletNo, { color: palette.danger }]}>✕</Text>
+            )}
+            <Text style={[styles.featureText, { color: currentPlan.features.has_ai_nutritionist ? palette.text : palette.muted }]}>
+              {isVn ? 'Chuyên gia dinh dưỡng AI (Tư vấn trực tiếp)' : 'AI Nutritionist Advice (Chatbot)'}
+            </Text>
+          </View>
+
+          <View style={styles.featureRow}>
+            {currentPlan.features.has_health_sync ? (
+              <Check size={16} color={palette.accent} />
+            ) : (
+              <Text style={[styles.bulletNo, { color: palette.danger }]}>✕</Text>
+            )}
+            <Text style={[styles.featureText, { color: currentPlan.features.has_health_sync ? palette.text : palette.muted }]}>
+              {isVn ? 'Đồng bộ Apple Health (Chỉ khả dụng cho Admin/VVIP)' : 'Sync to Apple Health (Admin/VVIP only)'}
+            </Text>
+          </View>
+
+          <View style={styles.featureRow}>
             <Check size={16} color={palette.accent} />
-          ) : (
-            <Text style={[styles.bulletNo, { color: palette.danger }]}>✕</Text>
-          )}
-          <Text style={[styles.featureText, { color: currentPlan.healthSync ? palette.text : palette.muted }]}>
-            {isVn ? 'Đồng bộ Apple Health (Chỉ khả dụng cho Admin/VVIP)' : 'Sync to Apple Health (Admin/VVIP only)'}
-          </Text>
-        </View>
+            <Text style={[styles.featureText, { color: palette.text }]}>
+              {isVn ? 'Thời gian xem lịch sử:' : 'History time limit:'}{' '}
+              <Text style={{ fontWeight: '600' }}>
+                {formatHistoryLimit(currentPlan.features.history_days_limit)}
+              </Text>
+            </Text>
+          </View>
 
-        <View style={styles.featureRow}>
-          <Check size={16} color={palette.accent} />
-          <Text style={[styles.featureText, { color: palette.text }]}>
-            {isVn ? 'Thời gian xem lịch sử:' : 'History time limit:'}{' '}
-            <Text style={{ fontWeight: '600' }}>{currentPlan.historyLimit}</Text>
-          </Text>
+          <View style={styles.featureRow}>
+            {currentPlan.vip_points_reward > 0 ? (
+              <Check size={16} color={palette.accent} />
+            ) : (
+              <Text style={[styles.bulletNo, { color: palette.danger }]}>✕</Text>
+            )}
+            <Text style={[styles.featureText, { color: currentPlan.vip_points_reward > 0 ? palette.text : palette.muted }]}>
+              {isVn ? `Điểm VIP thưởng: +${currentPlan.vip_points_reward} điểm` : `Bonus VIP rank points: +${currentPlan.vip_points_reward}`}
+            </Text>
+          </View>
         </View>
-
-        <View style={styles.featureRow}>
-          {currentPlan.points > 0 ? (
-            <Check size={16} color={palette.accent} />
-          ) : (
-            <Text style={[styles.bulletNo, { color: palette.danger }]}>✕</Text>
-          )}
-          <Text style={[styles.featureText, { color: currentPlan.points > 0 ? palette.text : palette.muted }]}>
-            {isVn ? `Điểm VIP thưởng: +${currentPlan.points} điểm` : `Bonus VIP rank points: +${currentPlan.points}`}
-          </Text>
-        </View>
-      </View>
+      )}
 
       {/* Box thông báo bảo mật */}
-      {currentPlan.code !== 'basic' && (
+      {currentPlan && currentPlan.code !== 'basic' && (
         <View style={[styles.infoBox, { backgroundColor: palette.accentSoft, borderColor: palette.border }]}>
           <ShieldAlert size={18} color={palette.accent} />
           <Text style={[styles.infoBoxText, { color: palette.accentText }]}>
@@ -361,18 +360,20 @@ export default function PaywallScreen() {
         {loading ? (
           <ActivityIndicator size="large" color={palette.accent} style={{ marginVertical: spacing.md }} />
         ) : (
-          <PrimaryButton
-            palette={palette}
-            label={
-              user?.subscription_tier === currentPlan.code || (!user?.subscription_tier && currentPlan.code === 'basic')
-                ? (isVn ? 'Đang sử dụng gói này' : 'Currently Active')
-                : (getPlanLevel(user?.subscription_tier) > getPlanLevel(currentPlan.code)
-                    ? (isVn ? 'Gói thấp hơn gói hiện tại' : 'Lower Than Current Plan')
-                    : (isVn ? `Nâng cấp lên gói ${getPlanDisplayName(currentPlan.code, currentPlan.name)}` : `Upgrade to ${getPlanDisplayName(currentPlan.code, currentPlan.name)}`))
-            }
-            onPress={handlePurchase}
-            icon={Zap}
-          />
+          currentPlan && (
+            <PrimaryButton
+              palette={palette}
+              label={
+                user?.subscription_tier === currentPlan.code || (!user?.subscription_tier && currentPlan.code === 'basic')
+                  ? (isVn ? 'Đang sử dụng gói này' : 'Currently Active')
+                  : (getPlanLevel(user?.subscription_tier) > getPlanLevel(currentPlan.code)
+                      ? (isVn ? 'Gói thấp hơn gói hiện tại' : 'Lower Than Current Plan')
+                      : (isVn ? `Nâng cấp lên gói ${getPlanDisplayName(currentPlan.code, currentPlan.name)}` : `Upgrade to ${getPlanDisplayName(currentPlan.code, currentPlan.name)}`))
+              }
+              onPress={handlePurchase}
+              icon={Zap}
+            />
+          )
         )}
       </View>
     </Screen>
@@ -380,6 +381,11 @@ export default function PaywallScreen() {
 }
 
 const styles = StyleSheet.create({
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   headerContainer: {
     alignItems: 'center',
     marginBottom: spacing.xl,

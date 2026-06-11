@@ -7,15 +7,22 @@ import { useAuthStore } from '@/src/store/auth';
 
 export function oauthUserToUserInformation(
   source: OAuthLoginUser | RefreshTokenData,
+  currentUser?: UserInformation | null,
 ): UserInformation {
   return {
     user_id: source.user_id.trim(),
     username: (source.username ?? '').trim(),
     email: source.email ?? '',
     avatar_link: source.avatar_link ?? '',
-    phone_number: '',
-    locale: 1,
-    theme: 3,
+    phone_number: currentUser?.phone_number ?? '',
+    locale: source.locale ?? currentUser?.locale ?? 1,
+    theme: currentUser?.theme ?? 3,
+    subscription_tier: currentUser?.subscription_tier,
+    subscription_expires_at: currentUser?.subscription_expires_at,
+    vip_points_earned: currentUser?.vip_points_earned,
+    vip_points_balance: currentUser?.vip_points_balance,
+    vip_rank: currentUser?.vip_rank,
+    role: currentUser?.role ?? source.role,
   };
 }
 
@@ -42,7 +49,10 @@ export async function tryRefreshSession(): Promise<boolean> {
 
     const data = result.data.data;
     const csrfToken = data.csrf_token.trim();
-    const user = oauthUserToUserInformation(data);
+    
+    const currentUser = useAuthStore.getState().user;
+    const user = oauthUserToUserInformation(data, currentUser);
+
     const { setSession } = useAuthStore.getState();
     setSession({ user, csrfToken });
     return true;

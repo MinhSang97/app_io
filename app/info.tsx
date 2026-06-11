@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { Globe, Info, Mail, Shield, User, Award, Zap, Sparkles, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -6,6 +6,7 @@ import { getLocale } from '../src/lib/localization';
 import { useAuthStore } from '../src/store/auth';
 import { useAppTheme } from '../src/hooks/use_app_theme';
 import { AppCard, BackHeader, InfoRow, Screen, spacing, radius } from '@/src/ui';
+import { syncUserProfileFromServer } from '../src/lib/user_profile';
 
 export default function InfoScreen() {
   const selectedCountry = useAuthStore((state) => state.selectedCountry);
@@ -15,7 +16,9 @@ export default function InfoScreen() {
 
   const [vipExpanded, setVipExpanded] = useState(false);
 
-  const isVn = selectedCountry === 'vn';
+  useEffect(() => {
+    void syncUserProfileFromServer();
+  }, []);
 
   const planNames: Record<string, Record<string, string>> = {
     basic: {
@@ -69,8 +72,11 @@ export default function InfoScreen() {
     return rankNames[key]?.[selectedCountry] || rankNames[key]?.['us'] || rankName || 'Bronze';
   };
 
-  const userDisplayName = user?.username?.trim() || 'F Calories User';
-  const userEmailAddress = user?.email?.trim() || 'No email shared';
+  const userDisplayName = user?.username?.trim() || locale.infoPage.defaultUserName;
+  const userEmailAddress = user?.email?.trim() || locale.alerts.noEmail;
+  const vipPointsText = locale.infoPage.vipPointsTemplate
+    .replace('{balance}', String(user?.vip_points_balance || 0))
+    .replace('{total}', String(user?.vip_points_earned || 0));
   const userIdFormatted = user?.user_id ? `${user.user_id.substring(0, 16)}...` : 'N/A';
 
   return (
@@ -103,7 +109,7 @@ export default function InfoScreen() {
           <Award size={20} color={palette.accent} />
           <View>
             <Text style={[styles.vipHeaderTitle, { color: palette.text }]}>
-              {isVn ? "Gói Dịch vụ & VIP" : "Membership & VIP"}
+              {locale.infoPage.membershipVip}
             </Text>
             <Text style={{ fontSize: 12, color: palette.subText, marginTop: 2 }}>
               {`${getPlanDisplayName(user?.subscription_tier)} • ⭐ ${getRankDisplayName(user?.vip_rank)} VIP`}
@@ -112,7 +118,7 @@ export default function InfoScreen() {
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
           <Text style={{ fontSize: 13, color: palette.accentText, fontWeight: '700' }}>
-            {vipExpanded ? (isVn ? "Thu gọn" : "Hide") : (isVn ? "Xem chi tiết" : "Details")}
+            {vipExpanded ? locale.infoPage.collapse : locale.infoPage.expandDetails}
           </Text>
           {vipExpanded ? (
             <ChevronUp size={16} color={palette.accent} />
@@ -131,7 +137,7 @@ export default function InfoScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[styles.detailRowLabel, { color: palette.muted }]}>
-                {isVn ? "Hạng Thành Viên" : "VIP Rank"}
+                {locale.infoPage.vipRankLabel}
               </Text>
               <Text style={[styles.detailRowValue, { color: palette.text }]}>
                 {`⭐ ${getRankDisplayName(user?.vip_rank)} VIP`}
@@ -147,7 +153,7 @@ export default function InfoScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[styles.detailRowLabel, { color: palette.muted }]}>
-                {isVn ? "Gói Đang Sử Dụng" : "Active Subscription"}
+                {locale.infoPage.activePlanLabel}
               </Text>
               <Text style={[styles.detailRowValue, { color: palette.text }]}>
                 {getPlanDisplayName(user?.subscription_tier)}
@@ -163,31 +169,45 @@ export default function InfoScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[styles.detailRowLabel, { color: palette.muted }]}>
-                {isVn ? "Điểm VIP tích lũy" : "VIP Points"}
+                {locale.infoPage.vipPointsLabel}
               </Text>
               <Text style={[styles.detailRowValue, { color: palette.text }]}>
-                {isVn 
-                  ? `Khả dụng: ${user?.vip_points_balance || 0} Pts (Tổng: ${user?.vip_points_earned || 0} Pts)`
-                  : `Balance: ${user?.vip_points_balance || 0} Pts (Total: ${user?.vip_points_earned || 0} Pts)`}
+                {vipPointsText}
               </Text>
             </View>
           </View>
 
           <View style={styles.detailDivider} />
 
-          <Pressable
-            onPress={() => router.push('/paywall')}
-            style={({ pressed }) => [
-              styles.upgradeButton,
-              { backgroundColor: palette.accentSoft },
-              pressed && styles.pressed,
-            ]}
-          >
-            <Text style={[styles.upgradeButtonText, { color: palette.accentText }]}>
-              {isVn ? "Nâng cấp / Thay đổi gói" : "Upgrade / Change Plan"}
-            </Text>
-            <ChevronRight size={16} color={palette.accent} />
-          </Pressable>
+          <View style={{ flexDirection: 'row', gap: spacing.md, marginTop: spacing.xs }}>
+            <Pressable
+              onPress={() => router.push('/paywall')}
+              style={({ pressed }) => [
+                styles.upgradeButton,
+                { backgroundColor: palette.accentSoft, flex: 1 },
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={[styles.upgradeButtonText, { color: palette.accentText }]}>
+                {locale.infoPage.upgradePlan}
+              </Text>
+              <ChevronRight size={16} color={palette.accent} />
+            </Pressable>
+
+            <Pressable
+              onPress={() => router.push('/vip')}
+              style={({ pressed }) => [
+                styles.upgradeButton,
+                { backgroundColor: palette.accentSoft, flex: 1 },
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={[styles.upgradeButtonText, { color: palette.accentText }]}>
+                {selectedCountry === 'vn' ? 'Đặc quyền VIP' : 'VIP Privileges'}
+              </Text>
+              <ChevronRight size={16} color={palette.accent} />
+            </Pressable>
+          </View>
         </View>
       )}
 

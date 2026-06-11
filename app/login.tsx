@@ -127,11 +127,13 @@ export default function LoginScreen() {
     const targetLocaleCode = LOCALE_BY_COUNTRY[previousSelectedCountry];
     if (currentBackendLocale !== targetLocaleCode) {
       const res = await update_user_locale(targetLocaleCode);
-      if (res.success) {
+      if (res.success && res.data?.data) {
+        const data = res.data.data;
+        const newCsrf = data.csrf_token.trim();
         const state = useAuthStore.getState();
         if (state.user) {
-          const updatedUser = { ...state.user, locale: targetLocaleCode };
-          state.setUser(updatedUser);
+          const updatedUser = oauthUserToUserInformation(data, state.user);
+          state.setSession({ user: updatedUser, csrfToken: newCsrf });
           state.setSelectedCountry(previousSelectedCountry);
         }
       } else {
