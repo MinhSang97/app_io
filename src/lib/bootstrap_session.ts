@@ -3,6 +3,7 @@ import { migrateAuthSessionFromAsyncStorage, hasAuthSessionOnDisk } from '@/src/
 import { restoreSessionSync } from '@/src/lib/restore_session_sync';
 import { useAuthStore, waitForAuthRehydration } from '@/src/store/auth';
 import { API_BASE_URL } from '@/src/config/urls';
+import { restoreAuthCookies } from '@/src/lib/cookie_store';
 
 /** Khôi phục phiên khi cold start — MMKV sync, không gọi API. */
 export async function bootstrapSession(): Promise<void> {
@@ -16,6 +17,7 @@ export async function bootstrapSession(): Promise<void> {
 
   try {
     restoreSessionSync();
+    restoreAuthCookies(); // restore auth cookies (jwt access/refresh) from MMKV
     await migrateAuthSessionFromAsyncStorage();
     restoreSessionSync();
     await waitForAuthRehydration();

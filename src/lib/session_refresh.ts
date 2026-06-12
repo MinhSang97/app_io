@@ -3,6 +3,7 @@ import type { OAuthLoginUser, RefreshTokenData } from '@/src/interfaces/oauth';
 import type { UserInformation } from '@/src/interfaces/user';
 import { clearAuthSessionSync } from '@/src/lib/auth_persistence';
 import { ensureSessionFromStorage } from '@/src/lib/ensure_session';
+import { clearPersistedCookies } from '@/src/lib/cookie_store';
 import { useAuthStore } from '@/src/store/auth';
 
 export function oauthUserToUserInformation(
@@ -65,5 +66,6 @@ export async function tryRefreshSession(): Promise<boolean> {
 
 export async function invalidateSession(): Promise<void> {
   clearAuthSessionSync();
+  clearPersistedCookies();
   useAuthStore.getState().signOut();
 }

@@ -4,15 +4,13 @@ import { API_BASE_URL, USER_PATHS } from '@/src/config/urls';
 import { ensureSessionFromStorage } from '@/src/lib/ensure_session';
 import { invalidateSession, tryRefreshSession } from '@/src/lib/session_refresh';
 import { useAuthStore } from '@/src/store/auth';
+import { cookieStore, parseCookiesInto, persistAuthCookies } from '@/src/lib/cookie_store';
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: false, // Disable native cookie jar — we handle cookies manually below
+  timeout: 30000, // 30s — prevents infinite spinner when server is unreachable
 });
-
-// Manual cookie store: read Set-Cookie from responses, inject Cookie header in requests.
-// iOS NSURLSession does not reliably send HTTP cookies via withCredentials for XHR requests.
-const cookieStore: Record<string, string> = {};
 
 /** Returns the current Cookie header string for use in non-Axios requests (e.g. fetch-based SSE). */
 export function getCookieHeader(): string {
@@ -21,24 +19,12 @@ export function getCookieHeader(): string {
     .join('; ');
 }
 
-function parseCookies(headers: string | string[]): void {
-  const raw = Array.isArray(headers) ? headers : [headers];
-  // React Native may concatenate multiple Set-Cookie headers into one string with ", " separator.
-  const cookies = raw.flatMap((h) => h.split(/, (?=[a-zA-Z_])/));
-  for (const cookie of cookies) {
-    const nameValue = cookie.split(';')[0]?.trim();
-    if (!nameValue) continue;
-    const eqIdx = nameValue.indexOf('=');
-    if (eqIdx < 0) continue;
-    const name = nameValue.slice(0, eqIdx).trim();
-    const value = nameValue.slice(eqIdx + 1).trim();
-    if (name) cookieStore[name] = value;
-  }
-}
-
 axiosInstance.interceptors.response.use((response) => {
   const setCookie = response.headers['set-cookie'];
-  if (setCookie) parseCookies(setCookie);
+  if (setCookie) {
+    parseCookiesInto(setCookie, cookieStore);
+    persistAuthCookies(); // persist auth cookies across app reloads
+  }
   return response;
 });
 
@@ -94,7 +80,16 @@ axiosInstance.interceptors.response.use(
     }
 
     config._retry = true;
-    const refreshed = await tryRefreshSession();
+
+    let refreshed = false;
+    try {
+      refreshed = await tryRefreshSession();
+    } catch {
+      // refresh request timed out or threw — treat as expired session
+      await invalidateSession();
+      return Promise.reject(error);
+    }
+
     if (refreshed) {
       await new Promise((resolve) => setTimeout(resolve, 50));
 
